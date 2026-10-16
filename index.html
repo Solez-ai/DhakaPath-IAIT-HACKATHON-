@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DhakaPath — Smart City Transit Platform</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Custom Fonts: Schibsted Grotesk, Hanken Grotesk, Geist Mono, Hind Siliguri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Schibsted+Grotesk:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+
+  <!-- Design Tokens -->
+  <link rel="stylesheet" href="css/tokens.css">
+
+  <!-- Application Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-signal selection:text-white">
+
+  <!-- Header Section (Cleaned: No 'v2 immersive' badge) -->
+  <header class="bg-surface border-b border-line px-4 py-2.5 flex items-center justify-between z-30 shrink-0 shadow-sm">
+    <div class="flex items-center gap-3">
+      <!-- Transport Icon Logo Lockup -->
+      <div class="w-9 h-9 rounded-md bg-signal text-signal-ink flex items-center justify-center font-display font-extrabold text-lg tracking-tight">
+        ঢ
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-display font-bold text-lg leading-none tracking-tight text-ink">DhakaPath</h1>
+          <span class="text-xs font-semibold px-1.5 py-0.5 rounded bg-surface-2 text-ink-2 border border-line">ঢাকাপথ</span>
+        </div>
+        <p class="text-xs text-ink-3 hidden sm:block" data-i18n="app.tagline">Dhaka Transit Network &amp; Routing Ledger</p>
+      </div>
+    </div>
+
+    <!-- Quick Controls & Actions -->
+    <div class="flex items-center gap-2">
+      <!-- One-click reproducible demo (scripted scenario, not a fake screen) -->
+      <button data-action="run-demo" data-i18n-title="action.demo" class="bg-ok/10 hover:bg-ok/20 text-ok text-xs font-semibold px-3 py-1.5 rounded-md border border-ok/30 flex items-center gap-1.5 transition-colors">
+        <i class="fa-solid fa-play"></i>
+        <span data-i18n="action.demo">Demo mode</span>
+      </button>
+
+      <!-- Demo-data disclosure -->
+      <button data-action="open-about" class="hidden sm:flex px-2.5 py-1.5 rounded-md bg-surface-2 hover:bg-line text-xs font-medium text-ink-2 transition-colors border border-line items-center gap-1.5">
+        <i class="fa-solid fa-circle-info"></i>
+        <span data-i18n="action.about">About data</span>
+      </button>
+
+      <!-- Emergency & Incident Report Button -->
+      <button data-action="open-incident" class="bg-signal/10 hover:bg-signal/20 text-signal text-xs font-semibold px-3 py-1.5 rounded-md border border-signal/30 flex items-center gap-1.5 transition-colors">
+        <i class="fa-solid me-1 fa-triangle-exclamation"></i>
+        <span>Report Issue</span>
+      </button>
+
+      <!-- Language Toggle (EN/BN) -->
+      <button id="langToggleBtn" data-action="toggle-language" class="px-2.5 py-1.5 rounded-md bg-surface-2 hover:bg-line text-xs font-mono font-medium text-ink transition-colors border border-line">
+        <span id="langLabel">EN</span>
+      </button>
+
+      <!-- Theme Switcher (Light/Dark) -->
+      <button data-action="toggle-theme" class="w-8 h-8 rounded-md bg-surface-2 hover:bg-line text-ink flex items-center justify-center transition-colors border border-line" title="Toggle Theme">
+        <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Work Area -->
+  <div class="flex-1 relative flex overflow-hidden">
+
+    <!-- Desktop Sidebar / Panel (≥768px Viewports) -->
+    <aside id="desktopSidebar" class="hidden md:flex flex-col w-[380px] lg:w-[420px] bg-surface border-r border-line z-20 shrink-0 h-full overflow-hidden shadow-md">
+
+      <!-- Panel Tabs -->
+      <div class="flex border-b border-line bg-surface-2 px-2 pt-2 gap-1 text-xs font-semibold">
+        <button data-action="switch-tab" data-tab="plan" id="tabBtn-plan" class="tab-btn px-3 py-2 rounded-t-md bg-surface border-t border-x border-line text-signal font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-route"></i> <span data-i18n="tab.plan">Route Planner</span>
+        </button>
+        <button data-action="switch-tab" data-tab="alerts" id="tabBtn-alerts" class="tab-btn px-3 py-2 rounded-t-md text-ink-2 hover:text-ink flex items-center gap-1.5">
+          <i class="fa-solid fa-bell"></i> <span data-i18n="tab.alerts">Live Alerts</span> <span class="bg-danger text-white text-[10px] px-1.5 py-0.2 rounded-full hidden" id="alertBadge"></span>
+        </button>
+        <button data-action="switch-tab" data-tab="ai" id="tabBtn-ai" class="tab-btn px-3 py-2 rounded-t-md text-ink-2 hover:text-ink flex items-center gap-1.5">
+          <i class="fa-solid fa-robot"></i> <span data-i18n="tab.ai">Transit AI</span>
+        </button>
+        <button data-action="switch-tab" data-tab="admin" id="tabBtn-admin" class="tab-btn px-3 py-2 rounded-t-md text-ink-2 hover:text-ink flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders"></i> <span data-i18n="tab.admin">Admin</span>
+        </button>
+      </div>
+
+      <!-- Tab Panels Scrollable Container -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4" id="sidebarContent">
+
+        <!-- PLAN TAB CONTENT -->
+        <div id="tabContent-plan" class="space-y-4">
+
+          <!-- Intent Search Bar -->
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-2" data-i18n="search.label">Intent-Aware Search</label>
+            <div class="relative">
+              <input type="text" id="searchInput" data-action="search-input" data-i18n-placeholder="search.placeholder" placeholder="e.g. Mirpur to Motijheel, student fare..." class="w-full bg-paper border border-line-strong rounded-md px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal font-body">
+              <button data-action="execute-search" class="absolute right-1.5 top-1.5 bg-signal text-signal-ink rounded px-2.5 py-1 text-xs font-medium hover:bg-opacity-90">
+                Go
+              </button>
+            </div>
+            <!-- Parsed Intent Chips -->
+            <div id="intentChips" class="flex flex-wrap gap-1.5 min-h-[22px]">
+              <span class="text-[11px] bg-surface-2 text-ink-2 px-2 py-0.5 rounded border border-line flex items-center gap-1">
+                <i class="fa-solid fa-location-dot text-[9px] text-signal"></i> Auto-Detecting Nodes
+              </span>
+            </div>
+          </div>
+
+          <!-- Arrive-By Guarantee -->
+          <div class="border border-line rounded-md bg-surface-2 p-2.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-ink-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-bullseye text-signal"></i> Arrive-By Guarantee
+              </span>
+              <span class="text-[10px] text-ink-3" title="Seeded Monte Carlo, 2,000 runs per route">2,000 simulations</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-[10px] font-semibold uppercase tracking-wider text-ink-3 shrink-0" for="deadlineInput">Reach by</label>
+              <input type="time" id="deadlineInput" data-action="set-deadline" value="09:00" class="flex-1 bg-paper border border-line-strong rounded px-2 py-1 text-xs text-ink focus:outline-none focus:border-signal font-mono">
+              <button data-action="clear-deadline" class="px-2 py-1 rounded border border-line text-[10px] text-ink-2 hover:bg-surface" title="Clear the deadline">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div id="arriveByReadout" class="text-[11px] text-ink-2 leading-snug">Set a time and every option shows its on-time probability.</div>
+          </div>
+
+          <!-- Live Conditions (Monsoon Shield + Simulation) -->
+          <details id="conditionsPanel" class="border border-line rounded-md bg-surface-2 overflow-hidden" open>
+            <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-cloud-showers-heavy text-water"></i> Live Conditions
+              <span id="scenarioBadge" class="ms-auto font-mono text-[10px] text-ink-3">normal</span>
+            </summary>
+
+            <div class="px-3 pb-3 space-y-3">
+              <!-- Dhaka Pulse -->
+              <div class="flex items-center gap-3">
+                <div class="relative w-12 h-12 shrink-0">
+                  <svg viewBox="0 0 36 36" class="w-12 h-12 -rotate-90">
+                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--line)" stroke-width="4"></circle>
+                    <circle id="pulseArc" cx="18" cy="18" r="15.5" fill="none" stroke="var(--signal)" stroke-width="4" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="97.4"></circle>
+                  </svg>
+                  <span id="pulseScore" class="absolute inset-0 flex items-center justify-center font-mono text-xs font-bold text-ink">0</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[11px] font-bold text-ink flex items-center gap-1.5">Dhaka Pulse <span id="pulseBand" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-surface border border-line text-ink-2">calm</span></p>
+                  <p id="pulseDetail" class="text-[10px] text-ink-3 leading-snug">Rain, worst-hub risk, peak hour and live reports in one index.</p>
+                </div>
+              </div>
+
+              <!-- Rain + rush -->
+              <div class="space-y-2">
+                <div class="flex items-center gap-1.5" role="group" aria-label="Rain level">
+                  <span class="text-[10px] font-semibold uppercase tracking-wider text-ink-3 w-10">Rain</span>
+                  <button data-action="set-rain" data-rain="none" class="rain-btn flex-1 px-2 py-1 rounded border border-line text-[11px] hover:border-signal">None</button>
+                  <button data-action="set-rain" data-rain="light" class="rain-btn flex-1 px-2 py-1 rounded border border-line text-[11px] hover:border-signal">Light</button>
+                  <button data-action="set-rain" data-rain="heavy" class="rain-btn flex-1 px-2 py-1 rounded border border-line text-[11px] hover:border-signal">Heavy</button>
+                </div>
+                <label class="flex items-center justify-between text-[11px] text-ink-2">
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-people-group text-signal"></i> Peak office rush</span>
+                  <input type="checkbox" id="rushToggle" data-action="toggle-rush" class="accent-[var(--signal)]">
+                </label>
+              </div>
+
+              <!-- Forecast hour -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-[10px] text-ink-3">
+                  <span id="forecastLabel" class="font-semibold uppercase tracking-wider">Forecast scrub</span>
+                  <span id="forecastRisk" class="font-mono">—</span>
+                </div>
+                <input type="range" id="forecastHour" data-action="set-forecast-hour" min="0" max="23" value="9" class="w-full accent-[var(--water)]">
+                <p id="forecastNudge" class="text-[10px] text-ink-3 leading-snug"></p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button data-action="use-live-weather" class="flex-1 bg-signal/10 text-signal border border-signal/30 rounded px-2 py-1.5 text-[11px] font-semibold hover:bg-signal/20">
+                  <i class="fa-solid fa-cloud-sun-rain me-1"></i> Use live weather
+                </button>
+                <button data-action="clear-scenario" class="px-2 py-1.5 rounded border border-line text-[11px] text-ink-2 hover:bg-surface" title="Reset rain, rush and closures">Reset</button>
+              </div>
+
+              <!-- Closures -->
+              <div class="space-y-1.5">
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-ink-3" for="blockedHubSelect">Close a station / hub</label>
+                <div class="flex items-center gap-2">
+                  <select id="blockedHubSelect" class="flex-1 bg-paper border border-line-strong rounded px-2 py-1 text-[11px] text-ink focus:outline-none focus:border-signal"></select>
+                  <button data-action="toggle-blocked-hub" class="px-2 py-1 rounded border border-line text-[11px] text-ink-2 hover:bg-surface">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+                <div id="blockedHubChips" class="flex flex-wrap gap-1 min-h-[20px]"></div>
+              </div>
+            </div>
+          </details>
+
+          <!-- Monsoon Shield proactive nudge -->
+          <div id="nudgeCard" class="hidden border border-l-2 border-line border-l-water rounded-md bg-water/5 p-2.5 space-y-1">
+            <p class="text-[11px] font-bold text-ink flex items-center gap-1.5"><i class="fa-solid fa-water text-water"></i> <span id="nudgeHeadline"></span></p>
+            <p id="nudgeBody" class="text-[11px] text-ink-2 leading-snug"></p>
+          </div>
+
+          <!-- Scenario delta banner -->
+          <div id="scenarioBanner" class="hidden border border-line rounded-md bg-surface p-2.5 text-[11px] text-ink-2 leading-snug"></div>
+
+          <!-- Fare Calculator: compare every route that serves a hub pair -->
+          <details id="fareCalculator" class="border border-line rounded-md bg-surface-2 overflow-hidden">
+            <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-calculator text-signal"></i> Fare Calculator
+              <span id="farePanelBadge" class="ms-auto font-mono text-[10px] text-ink-3">pick two hubs</span>
+            </summary>
+
+            <div class="px-3 pb-3 space-y-2">
+              <div class="grid grid-cols-2 gap-2">
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-ink-3">From
+                  <select id="fareFrom" data-action="fare-endpoint" class="mt-1 w-full bg-paper border border-line-strong rounded px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-signal"></select>
+                </label>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-ink-3">To
+                  <select id="fareTo" data-action="fare-endpoint" class="mt-1 w-full bg-paper border border-line-strong rounded px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-signal"></select>
+                </label>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button data-action="compare-fares" class="flex-1 bg-signal text-signal-ink rounded px-2.5 py-1.5 text-xs font-semibold hover:opacity-90">Compare routes</button>
+                <button data-action="swap-fare-endpoints" title="Swap origin and destination" class="px-2 py-1.5 rounded border border-line text-[11px] text-ink-2 hover:bg-surface">
+                  <i class="fa-solid fa-right-left"></i>
+                </button>
+              </div>
+
+              <div id="fareResults" class="space-y-1.5 pt-0.5">
+                <p class="text-[11px] text-ink-3">Choose an origin and a destination to compare fares.</p>
+              </div>
+
+              <!-- Official MRT-6 fare chart, rebuilt from the dataset distances -->
+              <div id="metroFareChart" class="border-t border-line pt-2"></div>
+
+              <!-- Fair Fare Coach: check what a driver asked for -->
+              <div class="border-t border-line pt-2 space-y-2">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-ink-3 flex items-center gap-1.5">
+                  <i class="fa-solid fa-hand-holding-dollar text-signal"></i> Fair Fare Coach — check a quote
+                </p>
+                <div class="flex items-center gap-1.5">
+                  <select id="quoteMode" class="bg-paper border border-line-strong rounded px-1.5 py-1 text-[11px] text-ink focus:outline-none focus:border-signal">
+                    <option value="metro">MRT-6</option>
+                    <option value="bus">City bus</option>
+                  </select>
+                  <input type="number" id="quoteKm" value="6" min="0.5" step="0.5" class="w-16 bg-paper border border-line-strong rounded px-1.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-signal" title="Distance in km">
+                  <span class="text-[10px] text-ink-3">km</span>
+                  <input type="number" id="quoteAmount" placeholder="they charged" class="flex-1 bg-paper border border-line-strong rounded px-1.5 py-1 text-[11px] font-mono text-ink focus:outline-none focus:border-signal">
+                  <button data-action="check-quote" class="px-2 py-1 rounded bg-signal text-signal-ink text-[11px] font-semibold hover:opacity-90">Check</button>
+                </div>
+                <div id="quoteVerdict" class="text-[11px] text-ink-3 leading-snug">Enter the distance and what you were charged: the checker compares it with the official rate for that mode (MRT-6 ৳5/km, bus ৳2.70/km) and says fair, high or over the published fare.</div>
+              </div>
+            </div>
+          </details>
+
+          <!-- Fare & Student Controls -->
+          <div class="flex items-center justify-between p-2.5 rounded-md bg-surface-2 border border-line text-xs">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-id-card text-signal"></i>
+              <span class="font-medium">Student Half Pass Mode</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="studentToggle" data-action="student-pass" class="sr-only peer">
+              <div class="w-9 h-5 bg-line-strong peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-signal"></div>
+            </label>
+          </div>
+
+          <!-- Route Options List -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs font-semibold text-ink-2">
+              <span data-i18n="routes.title">AVAILABLE ROUTES</span>
+              <span class="font-mono text-[11px]" id="routeCount">Loading options…</span>
+            </div>
+
+            <div id="routeResultsList" class="space-y-2.5">
+              <!-- Route Option Cards populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Bonus B2: spoken briefing + downloadable offline card for the selected plan -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button data-action="play-briefing" class="px-2.5 py-1.5 rounded border border-line text-[11px] font-semibold text-ink-2 hover:border-signal hover:text-signal flex items-center gap-1.5">
+              <i class="fa-solid fa-volume-high"></i> <span data-i18n="briefing.play">Play briefing</span>
+            </button>
+            <button data-action="download-card" class="px-2.5 py-1.5 rounded border border-line text-[11px] font-semibold text-ink-2 hover:border-signal hover:text-signal flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> <span data-i18n="briefing.card">Offline card</span>
+            </button>
+            <span id="briefingStatus" class="text-[10px] text-ink-3 leading-snug flex-1 min-w-[140px]"></span>
+          </div>
+
+          <!-- Selected Route Detailed Ledger Ribbon -->
+          <div id="routeDetailRibbon" class="hidden border border-line rounded-md bg-surface p-3 space-y-3">
+            <!-- Dynamic Route Ribbon Built via JavaScript -->
+          </div>
+
+        </div>
+
+        <!-- ADMIN TAB CONTENT (Part 1 — Transit & Street-Status CMS) -->
+        <div id="tabContent-admin" class="hidden space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-ink-2" data-i18n="admin.title">Transit &amp; Street-Status CMS</h3>
+            <button data-action="admin-lock" class="text-[10px] text-ink-3 hover:text-ink">lock</button>
+          </div>
+          <p id="adminOverridesBadge" class="font-mono text-[10px] text-ink-3"></p>
+
+          <!-- Passphrase gate: a demo lock, not server auth (see README) -->
+          <div id="adminGate" class="border border-line rounded-md bg-surface-2 p-3 space-y-2">
+            <label class="block text-[11px] font-semibold text-ink-2" for="adminPassphrase" data-i18n="admin.gate">Admin passphrase</label>
+            <div class="flex gap-2">
+              <input id="adminPassphrase" type="password" autocomplete="off" placeholder="dhakapath-admin"
+                class="flex-1 bg-paper border border-line-strong rounded px-2 py-1.5 text-xs text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal font-mono">
+              <button data-action="admin-unlock" data-i18n="action.unlock" class="bg-signal text-signal-ink rounded px-3 py-1.5 text-xs font-semibold hover:opacity-90">Unlock</button>
+            </div>
+            <p id="adminGateNote" class="text-[10px] text-ink-3 leading-snug">Demo-grade CMS: it edits the in-memory transit graph and persists to this browser only. The demo passphrase is printed in README.md.</p>
+          </div>
+
+          <div id="adminBody" class="hidden space-y-3">
+            <!-- Fare rules: one edit changes cards, ledger, coach, deltas and chat -->
+            <details class="border border-line rounded-md bg-surface-2 overflow-hidden" open>
+              <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-taka-sign text-signal"></i> Fare rules
+                <span class="ms-auto font-mono text-[10px] text-ink-3">৳/km · min · student % · surge</span>
+              </summary>
+              <div class="px-3 pb-3 overflow-x-auto">
+                <table class="w-full text-[11px] text-ink-2 text-left">
+                  <thead class="text-[9px] uppercase tracking-wider text-ink-3">
+                    <tr><th class="pb-1">Mode</th><th>per km</th><th>min</th><th>max</th><th>band</th><th>stdnt %</th><th></th></tr>
+                  </thead>
+                  <tbody id="adminRuleRows"></tbody>
+                </table>
+              </div>
+            </details>
+
+            <!-- Link registry: take a corridor out of service and the router reroutes -->
+            <details class="border border-line rounded-md bg-surface-2 overflow-hidden">
+              <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-diagram-project text-signal"></i> Transit network
+                <span id="adminLinkCount" class="ms-auto font-mono text-[10px] text-ink-3">links</span>
+              </summary>
+              <div class="px-3 pb-3 space-y-2">
+                <div class="flex gap-2">
+                  <select data-action="admin-link-filter" class="bg-paper border border-line-strong rounded px-2 py-1 text-[11px] text-ink focus:outline-none focus:border-signal">
+                    <option value="all">All modes</option>
+                    <option value="metro">MRT-6</option>
+                    <option value="bus">Bus (Bikolpo · Uttara)</option>
+                    <option value="walk">Walk</option>
+                  </select>
+                  <input data-action="admin-link-search" type="text" placeholder="filter by hub or route name"
+                    class="flex-1 bg-paper border border-line-strong rounded px-2 py-1 text-[11px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal">
+                </div>
+                <div id="adminLinkRows"></div>
+              </div>
+            </details>
+
+            <!-- Alert moderation queue -->
+            <details class="border border-line rounded-md bg-surface-2 overflow-hidden">
+              <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-gavel text-signal"></i> Report moderation
+                <span class="ms-auto font-mono text-[10px] text-ink-3">approve · hold · clear · delete</span>
+              </summary>
+              <div id="adminModeration" class="px-3 pb-3 space-y-2"></div>
+            </details>
+
+            <!-- Chronic waterlogging tendency drives Monsoon Shield risk -->
+            <details class="border border-line rounded-md bg-surface-2 overflow-hidden">
+              <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-water text-water"></i> Rainfall exposure by corridor
+                <span class="ms-auto font-mono text-[10px] text-ink-3">from the forecast</span>
+              </summary>
+              <div id="adminVulnerability" class="px-3 pb-3 space-y-1.5"></div>
+            </details>
+
+            <!-- Data: export the payload, import a teammate's payload -->
+            <details class="border border-line rounded-md bg-surface-2 overflow-hidden">
+              <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+                <i class="fa-solid fa-file-export text-signal"></i> Data &amp; fare charts
+              </summary>
+              <div class="px-3 pb-3 space-y-2">
+                <div class="flex flex-wrap gap-2">
+                  <button data-action="admin-save" data-i18n="action.save" class="px-2.5 py-1 rounded border border-line text-[11px] text-ink-2 hover:border-line-strong">Save</button>
+                  <button data-action="admin-export" data-i18n="action.export" class="px-2.5 py-1 rounded border border-line text-[11px] text-ink-2 hover:border-line-strong">Export JSON</button>
+                  <button data-action="admin-reset-network" class="px-2.5 py-1 rounded border border-line text-[11px] text-danger hover:border-danger">Reset to demo seed</button>
+                </div>
+                <textarea id="adminImportInput" rows="3" placeholder='{"network": …, "alerts": […]}'
+                  class="w-full bg-paper border border-line-strong rounded px-2 py-1.5 text-[10px] font-mono text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal"></textarea>
+                <button data-action="admin-import" data-i18n="action.import" class="px-2.5 py-1 rounded border border-line text-[11px] text-ink-2 hover:border-line-strong">Import JSON</button>
+                <p id="adminImportNote" class="text-[10px] text-ink-3"></p>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- ALERTS TAB CONTENT -->
+        <div id="tabContent-alerts" class="hidden space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-ink-2" data-i18n="alerts.title">City Infrastructure Alerts</h3>
+            <button id="refreshAlertsBtn" data-action="refresh-alerts" class="text-xs text-signal hover:underline"><i class="fa-solid fa-arrows-rotate me-1"></i> <span data-i18n="action.refresh">Refresh</span></button>
+          </div>
+          <!-- Paste a post / say it — social ingest with validation -->
+          <details id="ingestPanel" class="border border-line rounded-md bg-surface-2 overflow-hidden">
+            <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-paste text-signal"></i> <span data-i18n="ingest.title">Paste a post / say it</span>
+              <span class="ms-auto font-mono text-[10px] text-ink-3">unverified → checked</span>
+            </summary>
+            <div class="px-3 pb-3 space-y-2">
+              <textarea id="postInput" rows="3" placeholder="Paste a Facebook / WhatsApp / Telegram post in Bangla, Banglish or English…&#10;e.g. &quot;Motijheel e pani jome gese, bus ashte deri hocche&quot;"
+                class="w-full bg-paper border border-line-strong rounded px-2 py-1.5 text-[11px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal resize-y"></textarea>
+              <div class="flex items-center gap-2">
+                <button data-action="ingest-post" class="flex-1 bg-signal text-signal-ink rounded px-2.5 py-1.5 text-[11px] font-semibold hover:opacity-90">
+                  <i class="fa-solid fa-shield-halved me-1"></i> Check &amp; add report
+                </button>
+                <button data-action="voice-report" class="px-2 py-1.5 rounded border border-line text-[11px] text-ink-2 hover:bg-surface" title="Dictate a report">
+                  <i class="fa-solid fa-microphone"></i>
+                </button>
+              </div>
+              <p id="ingestVerdict" class="text-[11px] text-ink-3 leading-snug">Nothing is published unchecked: parsed → sanity-checked → de-duplicated → decayed.</p>
+            </div>
+          </details>
+
+          <div id="alertsList" class="space-y-2.5">
+            <!-- Dynamic Alert Cards -->
+          </div>
+
+          <!-- Provenance feed: why the ledger looks the way it does -->
+          <details id="feedPanel" class="border border-line rounded-md bg-surface-2 overflow-hidden">
+            <summary class="cursor-pointer select-none px-3 py-2 text-xs font-semibold text-ink-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check text-signal"></i> Validation feed
+              <span id="feedCount" class="ms-auto font-mono text-[10px] text-ink-3">0</span>
+            </summary>
+            <div id="feedList" class="px-3 pb-3 space-y-1.5 text-[11px] text-ink-2"></div>
+          </details>
+        </div>
+
+        <!-- AI DISPATCH DESK TAB CONTENT -->
+        <div id="tabContent-ai" class="hidden flex flex-col h-full min-h-[360px]">
+          <div class="text-xs text-ink-2 pb-2 border-b border-line mb-2 flex items-center justify-between">
+            <span><i class="fa-solid fa-bolt text-signal me-1"></i> <span id="aiModelLabel">Transit Desk</span></span>
+            <span id="aiStatus" class="text-[10px] bg-surface-2 text-ink-2 border border-line px-1.5 py-0.5 rounded font-mono">OFFLINE</span>
+          </div>
+          <div id="chatMessages" class="flex-1 overflow-y-auto space-y-3 text-xs mb-3 pr-1">
+            <div class="p-2.5 rounded bg-surface-2 border-l-2 border-signal text-ink">
+              <p class="font-semibold text-signal mb-1">Transit Dispatch Assistant</p>
+              <p>Welcome to DhakaPath. Ask me about fares, congestion around Kawran Bazar, MRT Line 6 timing, or custom detour strategies.</p>
+            </div>
+          </div>
+          <div class="flex gap-1.5 pt-2 border-t border-line">
+            <input type="text" id="chatInput" data-i18n-placeholder="chat.placeholder" placeholder="Ask AI assistant..." class="flex-1 bg-paper border border-line-strong rounded px-2.5 py-1.5 text-xs text-ink focus:outline-none focus:border-signal">
+            <button data-action="send-chat" class="bg-signal text-signal-ink rounded px-3 py-1.5 text-xs font-semibold">Send</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Quick Info & Legal Links -->
+      <div class="border-t border-line p-2.5 bg-surface-2 text-[11px] text-ink-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button data-action="open-faq" class="hover:underline hover:text-ink"><i class="fa-solid fa-circle-question me-0.5"></i> FAQ</button>
+          <span>•</span>
+          <button data-action="open-privacy" class="hover:underline hover:text-ink"><i class="fa-solid fa-shield-halved me-0.5"></i> Privacy</button>
+        </div>
+        <button data-action="open-shortcuts" class="font-mono bg-paper border border-line px-1.5 py-0.5 rounded text-[10px] hover:border-signal">⌘K / Ctrl+K</button>
+      </div>
+
+    </aside>
+
+    <!-- Map Area (Fills entire screen on mobile, remainder on desktop) -->
+    <main class="flex-1 relative h-full w-full bg-paper">
+      <div id="map" class="w-full h-full map-container"></div>
+
+      <!-- Floating Map Control Cluster -->
+      <div class="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
+        <button data-action="center-location" class="w-9 h-9 rounded-md bg-surface text-ink border border-line shadow-md flex items-center justify-center hover:bg-surface-2 transition-colors" title="Locate Me">
+          <i class="fa-solid fa-location-crosshairs text-sm text-signal"></i>
+        </button>
+        <button id="layerToggleBtn" data-action="toggle-map-layers" aria-pressed="true" class="w-9 h-9 rounded-md bg-surface text-ink border border-line shadow-md flex items-center justify-center hover:bg-surface-2 transition-colors" title="Hide Disrupted Hubs Overlay">
+          <i id="layerToggleIcon" class="fa-solid fa-layer-group text-sm text-signal"></i>
+        </button>
+      </div>
+
+      <!-- Live Disruptions Banner (Mobile & Desktop Map Overlay) -->
+      <div class="absolute top-3 left-3 right-12 md:right-auto md:max-w-xs z-[1000] bg-surface/95 backdrop-blur-sm border border-line rounded-md p-2 shadow-md text-xs">
+        <div class="flex items-center justify-between font-semibold text-danger">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-danger pulse-glow"></span>
+            <span id="disruptionHeading">Active Disruptions</span>
+          </span>
+          <span id="disruptionUpdatedAt" class="font-mono text-[10px] text-ink-3">LOADING</span>
+        </div>
+        <p id="disruptionSummary" class="text-[11px] text-ink-2 mt-0.5 truncate">Reading the live incident ledger…</p>
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Sheet Drawer (<768px Viewports) -->
+    <div id="mobileBottomSheet" class="md:hidden fixed inset-x-0 bottom-0 z-30 bg-surface border-t border-line rounded-t-xl shadow-2xl transition-transform duration-300 transform sheet-half max-h-[85vh] flex flex-col">
+      <!-- Sheet Drag Handle -->
+      <div data-action="toggle-sheet" class="w-full py-2.5 flex items-center justify-center cursor-grab active:cursor-grabbing">
+        <div class="w-12 h-1.5 bg-line-strong rounded-full"></div>
+      </div>
+
+      <!-- Mobile Content Scroll Area -->
+      <div class="flex-1 overflow-y-auto px-4 pb-6 space-y-4">
+
+        <!-- Search & Planner -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-ink-2">Plan Your Route</span>
+            <button data-action="open-incident" class="text-xs bg-signal/10 text-signal font-semibold px-2 py-0.5 rounded border border-signal/20">
+              <i class="fa-solid fa-plus me-1"></i> Report
+            </button>
+          </div>
+          <input type="text" id="mobileSearchInput" data-action="search-input" data-i18n-placeholder="mobile.search.placeholder" placeholder="Where to? (e.g. Uttara to Motijheel)" class="w-full bg-paper border border-line-strong rounded-md px-3 py-2 text-sm text-ink focus:outline-none focus:border-signal">
+        </div>
+
+        <!-- Quick Route Tabs on Mobile -->
+        <div id="mobileRouteList" class="space-y-2">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Selected Route Detail Ribbon Mobile -->
+        <div id="mobileRouteDetail" class="border border-line rounded-md bg-surface-2 p-3 space-y-2">
+          <p class="text-xs text-ink-2">Select a route above to view the detailed fare ledger and station nodes.</p>
+        </div>
+
+        <!-- Legal & Quick Info Footer for Mobile -->
+        <div class="pt-3 border-t border-line flex items-center justify-between text-xs text-ink-3">
+          <button data-action="open-faq" class="hover:underline">FAQ</button>
+          <button data-action="open-privacy" class="hover:underline">Privacy Policy</button>
+          <button data-action="open-shortcuts" class="hover:underline">Shortcuts</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TRANSIENT STATUS TOAST (demo steps, briefings, admin confirmations) -->
+  <div id="appToast" class="hidden fixed bottom-4 left-4 z-[60] max-w-sm items-center gap-2 bg-ink text-paper text-xs px-3 py-2 rounded-md shadow-lg" role="status" aria-live="polite"></div>
+
+  <!-- ABOUT DATA MODAL — the demo-data disclosure the brief requires -->
+  <div id="aboutModal" class="hidden fixed inset-0 z-[2000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface border border-line rounded-lg w-full max-w-lg p-4 space-y-3 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-line pb-2">
+        <h3 class="font-display font-bold text-base text-ink">About this data</h3>
+        <button data-action="close-about" data-i18n-aria="action.close" aria-label="Close" class="text-ink-3 hover:text-ink"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="text-xs text-ink-2 space-y-2 leading-relaxed">
+        <p><strong class="text-ink">Demo data, clearly labelled.</strong> Hub coordinates, link distances, fares, headways, flood vulnerabilities and the seeded street reports in DhakaPath are realistic <em>estimates</em> assembled for this prototype. They are not official BRTA, DMTCL or DNCC figures, and they are not a live feed.</p>
+        <p><strong class="text-ink">What is real:</strong> the weather comes from Open-Meteo for Dhaka when the server is running, and the map tiles come from OpenStreetMap.</p>
+        <p><strong class="text-ink">Every number is computed, not written.</strong> Routes come from the link graph, fares from the fare rules, on-time odds from a seeded Monte-Carlo run. Ask the engine — the admin panel will show you the same tables the math reads from.</p>
+        <p class="font-mono text-[11px] text-ink-3">Loaded <span id="aboutStamp">—</span> · 100% free stack · works with no API key at all.</p>
+      </div>
+      <div class="flex justify-between gap-2 pt-1 border-t border-line">
+        <button data-action="run-demo" data-i18n="action.demo" class="px-3 py-1.5 rounded border border-ok/40 text-ok text-xs font-semibold hover:bg-ok/10">Demo mode</button>
+        <button data-action="close-about" class="px-4 py-1.5 rounded bg-signal text-signal-ink text-xs font-bold hover:opacity-90">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM INCIDENT & LOCATION REPORTING MODAL -->
+  <div id="incidentModal" class="hidden fixed inset-0 z-[2000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface border border-line rounded-lg w-full max-w-md p-4 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-line pb-2.5">
+        <h3 class="font-display font-bold text-base text-ink flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-signal"></i>
+          Report City Incident
+        </h3>
+        <button data-action="close-incident" class="text-ink-3 hover:text-ink text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>          <!-- Incident Category Pills (icon-set glyphs, no emoji) -->
+          <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-ink-2">Incident Category</label>
+        <div class="grid grid-cols-2 gap-2 text-xs" id="categoryPills">
+          <button type="button" data-action="select-category" data-category="Resting / Waiting Place" class="cat-pill border border-line rounded p-2 text-left bg-surface-2 hover:border-signal flex items-center gap-2">
+            <i class="fa-solid fa-person-shelter text-signal text-sm w-4"></i>
+            <div>
+              <p class="font-bold text-ink">Resting Spot</p>
+              <p class="text-[10px] text-ink-3">Safe sleep/wait area</p>
+            </div>
+          </button>
+          <button type="button" data-action="select-category" data-category="Waterlogging" class="cat-pill border border-line rounded p-2 text-left bg-surface-2 hover:border-signal flex items-center gap-2">
+            <i class="fa-solid fa-water text-water text-sm w-4"></i>
+            <div>
+              <p class="font-bold text-ink">Waterlogging</p>
+              <p class="text-[10px] text-ink-3">Rain/flood risk</p>
+            </div>
+          </button>
+          <button type="button" data-action="select-category" data-category="Transit Delay" class="cat-pill border border-line rounded p-2 text-left bg-surface-2 hover:border-signal flex items-center gap-2">
+            <i class="fa-solid fa-bus text-warn text-sm w-4"></i>
+            <div>
+              <p class="font-bold text-ink">Transit Delay</p>
+              <p class="text-[10px] text-ink-3">Bus/Metro blockage</p>
+            </div>
+          </button>
+          <button type="button" data-action="select-category" data-category="Road Hazard" class="cat-pill border border-line rounded p-2 text-left bg-surface-2 hover:border-signal flex items-center gap-2">
+            <i class="fa-solid fa-road-barrier text-danger text-sm w-4"></i>
+            <div>
+              <p class="font-bold text-ink">Road Block</p>
+              <p class="text-[10px] text-ink-3">Construction / Hazard</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Location Input with Native Device Geolocation Detector -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <label class="block text-xs font-semibold text-ink-2">Arbitrary Location or Landmark</label>
+          <button type="button" data-action="detect-location" class="text-xs text-signal font-semibold hover:underline flex items-center gap-1">
+            <i class="fa-solid fa-crosshairs"></i> Detect Current GPS
+          </button>
+        </div>
+        <input type="text" id="incidentLocationInput" placeholder="e.g. Under Kawran Bazar flyover near footbridge" class="w-full bg-paper border border-line-strong rounded px-3 py-2 text-xs text-ink focus:outline-none focus:border-signal">
+        <p id="geoStatusText" class="text-[11px] text-ok font-mono hidden"><i class="fa-solid fa-check me-1"></i> GPS Coordinates Detected!</p>
+        <label class="block text-[10px] font-semibold uppercase tracking-wider text-ink-3 pt-1" for="incidentHubSelect">Nearest hub in the transit graph</label>
+        <select id="incidentHubSelect" class="w-full bg-paper border border-line-strong rounded px-2 py-1.5 text-xs text-ink focus:outline-none focus:border-signal"></select>
+        <p class="text-[10px] text-ink-3">Every report is snapped to a node, then sanity-checked, de-duplicated and decayed before it can change routing.</p>
+      </div>
+
+      <!-- Description Textarea -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-ink-2">Details & Notes</label>
+        <textarea id="incidentDetailsInput" rows="3" placeholder="Describe the conditions, safe waiting area capacity, or water depth..." class="w-full bg-paper border border-line-strong rounded p-2.5 text-xs text-ink focus:outline-none focus:border-signal"></textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-2 pt-2 border-t border-line">
+        <button data-action="close-incident" class="px-3 py-1.5 rounded border border-line text-xs font-medium text-ink-2 hover:bg-surface-2">Cancel</button>
+        <button data-action="submit-incident" class="px-4 py-1.5 rounded bg-signal text-signal-ink text-xs font-bold hover:opacity-90">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ MODAL -->
+  <div id="faqModal" class="hidden fixed inset-0 z-[2000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface border border-line rounded-lg w-full max-w-md p-4 space-y-3 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-line pb-2">
+        <h3 class="font-display font-bold text-base text-ink">Frequently Asked Questions</h3>
+        <button data-action="close-faq" class="text-ink-3 hover:text-ink"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-2.5 text-xs text-ink-2">
+        <details class="border border-line rounded p-2 bg-surface-2">
+          <summary class="font-semibold text-ink cursor-pointer">How are fares calculated?</summary>
+          <p class="mt-1">Fares are computed per mode from the fare rules table (per-km rate, minimum fare, student discount, surge multipliers), not typed in by hand. The rates are realistic estimates for this prototype, not official BRTA or DMTCL tariffs. The Admin tab shows the exact table the math reads from.</p>
+        </details>
+        <details class="border border-line rounded p-2 bg-surface-2">
+          <summary class="font-semibold text-ink cursor-pointer">Does student pass apply to all modes?</summary>
+          <p class="mt-1">The 50% student discount with a ৳10 floor applies to public buses. MRT-6, leguna, rickshaw, CNG and ferry links do not carry a student rate in this model, and the fare ledger says so on every leg. The rules live in one table: change it in the Admin tab and every screen follows.</p>
+        </details>
+        <details class="border border-line rounded p-2 bg-surface-2">
+          <summary class="font-semibold text-ink cursor-pointer">How does location detection work?</summary>
+          <p class="mt-1">We use your browser's HTML5 Geolocation API with strict privacy protection. Coordinates are used solely for localized route planning and crowd reporting.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACY POLICY MODAL -->
+  <div id="privacyModal" class="hidden fixed inset-0 z-[2000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface border border-line rounded-lg w-full max-w-md p-4 space-y-3 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-line pb-2">
+        <h3 class="font-display font-bold text-base text-ink">Privacy Policy</h3>
+        <button data-action="close-privacy" class="text-ink-3 hover:text-ink"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="text-xs text-ink-2 space-y-2 leading-relaxed">
+        <p><strong>1. Data Minimization:</strong> DhakaPath does not require registration or store personal identity markers.</p>
+        <p><strong>2. Geolocation:</strong> Device GPS coordinates are processed strictly client-side to calculate local transit distances and are never sold to third parties.</p>
+        <p><strong>3. Crowd Reports:</strong> Incident submissions (waterlogging, resting spots) are stored anonymously to inform the city transit graph.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYBOARD SHORTCUTS MODAL -->
+  <div id="shortcutsModal" class="hidden fixed inset-0 z-[2000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-surface border border-line rounded-lg w-full max-w-sm p-4 space-y-3 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-line pb-2">
+        <h3 class="font-display font-bold text-base text-ink">Keyboard Shortcuts</h3>
+        <button data-action="close-shortcuts" class="text-ink-3 hover:text-ink"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-2 text-xs font-mono">
+        <div class="flex justify-between p-1.5 bg-surface-2 rounded border border-line">
+          <span>Focus Search</span>
+          <span class="text-signal font-bold">/  or  ⌘K</span>
+        </div>
+        <div class="flex justify-between p-1.5 bg-surface-2 rounded border border-line">
+          <span>Toggle Language</span>
+          <span class="text-signal font-bold">Alt + L</span>
+        </div>
+        <div class="flex justify-between p-1.5 bg-surface-2 rounded border border-line">
+          <span>Report Incident</span>
+          <span class="text-signal font-bold">Alt + R</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Entry Point (ES modules: serve this page over http://) -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

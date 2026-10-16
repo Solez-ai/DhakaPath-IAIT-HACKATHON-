@@ -1,0 +1,150 @@
+/* ===============================
+   Global Enforcements
+   =============================== */
+*, ::before, ::after {
+  box-sizing: border-box !important;
+}
+
+html {
+  font-size: 16px; /* Prevents iOS auto-zoom on input focus */
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'Hanken Grotesk', 'Hind Siliguri', sans-serif;
+  overflow-x: hidden;
+  touch-action: manipulation;
+}
+
+/* Bangla needs a taller line-height and no letter-spacing or italics.
+   The dictionary sets lang="bn" on <html>; everything below keys off that. */
+html.lang-bn body {
+  font-family: 'Hind Siliguri', 'Hanken Grotesk', sans-serif;
+}
+
+html.lang-bn h1,
+html.lang-bn h2,
+html.lang-bn h3,
+html.lang-bn summary,
+html.lang-bn button,
+html.lang-bn label,
+html.lang-bn p {
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+html.lang-bn .uppercase,
+html.lang-bn [class*="tracking-"] {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Focus visibility is never optional (DESIGN.md §6) */
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* Tabular Numerics for money and time */
+.num-tabular {
+  font-family: 'Geist Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===============================
+   Map Styling & Custom Filter per DESIGN.md Section 8.9
+   =============================== */
+.map-container .leaflet-tile-pane {
+  filter: grayscale(0.85) sepia(0.15) contrast(0.92) brightness(1.03);
+}
+[data-theme="dark"] .map-container .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(1.2);
+}
+
+/* Custom Leaflet Hub Marker */
+.custom-hub-marker {
+  background: var(--surface);
+  border: 2px solid var(--signal);
+  border-radius: 50%;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.map-container {
+  background: linear-gradient(180deg, #edf4f7 0%, #dfe7ee 100%);
+}
+
+.map-container .leaflet-control-zoom {
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.map-container .leaflet-control-zoom a {
+  color: var(--ink);
+}
+
+.map-container .leaflet-popup-content-wrapper,
+.map-container .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.98);
+  color: var(--ink);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
+}
+
+.map-container .leaflet-interactive {
+  transition: stroke-width 0.18s ease, opacity 0.18s ease;
+}
+
+.map-container .leaflet-interactive:hover {
+  opacity: 1;
+}
+
+/* ===============================
+   Custom Scrollbars
+   =============================== */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 4px;
+}
+
+/* ===============================
+   Touch Bottom Sheet Drawer Snap Points
+   =============================== */
+.bottom-sheet {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sheet-peek { transform: translateY(calc(100% - 96px)); }
+.sheet-half { transform: translateY(50%); }
+.sheet-full { transform: translateY(0%); }
+
+/* ===============================
+   Custom Animation Effects
+   =============================== */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.pulse-glow { animation: pulseGlow 2s infinite ease-in-out; }
+
+/* Odometer Digit Flash */
+.fare-update-flash {
+  animation: fareFlash 0.4s ease-out;
+}
+@keyframes fareFlash {
+  0% { color: var(--signal); transform: scale(1.08); }
+  100% { color: inherit; transform: scale(1); }
+}

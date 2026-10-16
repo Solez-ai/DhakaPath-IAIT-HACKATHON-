@@ -1,0 +1,15 @@
+# Local secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# Dependencies / tooling
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

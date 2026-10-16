@@ -1,0 +1,60 @@
+/* DESIGN.md Tokens Setup */
+:root {
+  --paper: #F5F2EA;
+  --surface: #FBF9F4;
+  --surface-2: #EFEBE1;
+  --line: #DDD7C8;
+  --line-strong: #C4BCA8;
+  --ink: #15191C;
+  --ink-2: #4A5157;
+  --ink-3: #7A8087;
+
+  --signal: #C8401A;
+  --signal-ink: #FFFFFF;
+  --signal-wash: #F6DDD3;
+  --ok: #1F7A4D;
+  --warn: #B97700;
+  --danger: #B42318;
+  --water: #2F6DA3;
+
+  --m-metro: #0E6B4D;
+  --m-bus: #D98E04;
+  --m-leguna: #137A86;
+  --m-connector: #8E3B6B;
+  --m-walk: #7A8087;
+
+  --e-0: none;
+  --e-1: 0 1px 2px rgba(40, 30, 10, 0.06), 0 4px 12px rgba(40, 30, 10, 0.05);
+  --e-2: 0 8px 24px rgba(40, 30, 10, 0.12), 0 2px 6px rgba(40, 30, 10, 0.08);
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+}
+
+[data-theme="dark"] {
+  --paper: #0E1311;
+  --surface: #151B18;
+  --surface-2: #1C2420;
+  --line: #26302B;
+  --line-strong: #36433C;
+  --ink: #ECE8DE;
+  --ink-2: #B4B2A8;
+  --ink-3: #80857F;
+
+  --signal: #F0653A;
+  --signal-ink: #1A0A04;
+  --signal-wash: #2B1710;
+  --ok: #4FBF85;
+  --warn: #E8A82E;
+  --danger: #F2695E;
+  --water: #6BA6DD;
+
+  --m-metro: #3FBF93;
+  --m-bus: #F0B23A;
+  --m-leguna: #46BCCB;
+  --m-connector: #D17BAE;
+
+  --e-1: 0 2px 8px rgba(0,0,0,0.4);
+  --e-2: 0 8px 28px rgba(0,0,0,0.6);
+}

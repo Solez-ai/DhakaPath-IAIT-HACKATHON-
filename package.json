@@ -1,0 +1,15 @@
+{
+  "name": "dhakapath",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DhakaPath — live urban transit & route intelligence for Dhaka (demo data)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node tests/run.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
