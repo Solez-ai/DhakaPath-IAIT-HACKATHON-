@@ -70,8 +70,8 @@ export function renderRoutes() {
         </div>
         <div class="text-right shrink-0">
           <p class="font-mono text-base font-bold text-ink">${money(card.baseFare)}</p>
-          ${state.studentPass && card.studentFare < card.baseFare
-            ? `<p class="font-mono text-[10px] text-ok">${money(card.studentFare)} student</p>`
+          ${state.studentPass
+            ? `<p class="font-mono text-[10px] ${card.studentFare < card.baseFare ? 'text-ok' : 'text-ink-2'}">${money(card.studentFare)} student${card.studentFare < card.baseFare ? ` · saves ${money(card.baseFare - card.studentFare)}` : ' (bus legs half price; MRT-6 has no student fare)'}</p>`
             : `<p class="font-mono text-[10px] text-ink-3">regular</p>`}
         </div>
       </div>

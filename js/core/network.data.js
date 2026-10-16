@@ -749,6 +749,384 @@ export const HUBS = [
     ],
     "aliases": [],
     "interchange": false
+  },
+  {
+    "id": "bus-chittagong",
+    "name": "Chittagong",
+    "lat": 22.3569,
+    "lng": 91.7832,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-chittagong"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-sylhet",
+    "name": "Sylhet",
+    "lat": 24.8949,
+    "lng": 91.8687,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-sylhet"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-khulna",
+    "name": "Khulna",
+    "lat": 22.8456,
+    "lng": 89.5403,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-khulna"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-rajshahi",
+    "name": "Rajshahi",
+    "lat": 24.3745,
+    "lng": 88.6042,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-rajshahi"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-barisal",
+    "name": "Barisal",
+    "lat": 22.7010,
+    "lng": 90.3535,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-barisal"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-rangpur",
+    "name": "Rangpur",
+    "lat": 25.7558,
+    "lng": 89.2544,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-rangpur"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-mymensingh",
+    "name": "Mymensingh",
+    "lat": 24.7471,
+    "lng": 90.4226,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-mymensingh"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-comilla",
+    "name": "Comilla",
+    "lat": 23.4683,
+    "lng": 91.1802,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-comilla"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-bogra",
+    "name": "Bogra",
+    "lat": 24.8510,
+    "lng": 89.3712,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-bogra"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-gazipur",
+    "name": "Gazipur",
+    "lat": 24.0023,
+    "lng": 90.4265,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-gazipur"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-narayanganj",
+    "name": "Narayanganj",
+    "lat": 23.6123,
+    "lng": 90.4969,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-narayanganj"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-narsingdi",
+    "name": "Narsingdi",
+    "lat": 23.9228,
+    "lng": 90.7224,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-narsingdi"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-tangail",
+    "name": "Tangail",
+    "lat": 24.2511,
+    "lng": 89.9174,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-tangail"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-jamalpur",
+    "name": "Jamalpur",
+    "lat": 24.9005,
+    "lng": 89.9400,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-jamalpur"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-coxs-bazar",
+    "name": "Cox's Bazar",
+    "lat": 21.4385,
+    "lng": 92.0038,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-coxs-bazar"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-feni",
+    "name": "Feni",
+    "lat": 23.0242,
+    "lng": 91.3997,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-feni"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-pabna",
+    "name": "Pabna",
+    "lat": 24.0064,
+    "lng": 89.2381,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-pabna"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-sirajganj",
+    "name": "Sirajganj",
+    "lat": 24.4531,
+    "lng": 89.7107,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-sirajganj"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-dinajpur",
+    "name": "Dinajpur",
+    "lat": 25.6245,
+    "lng": 88.6375,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-dinajpur"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-jessore",
+    "name": "Jessore",
+    "lat": 23.1661,
+    "lng": 89.2171,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-jessore"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-kushtia",
+    "name": "Kushtia",
+    "lat": 23.9019,
+    "lng": 89.1301,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-kushtia"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-noakhali",
+    "name": "Noakhali",
+    "lat": 22.8129,
+    "lng": 91.0884,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-noakhali"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-saidpur",
+    "name": "Saidpur",
+    "lat": 25.7671,
+    "lng": 88.9038,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-saidpur"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-gaibandha",
+    "name": "Gaibandha",
+    "lat": 25.3242,
+    "lng": 89.5394,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-gaibandha"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-netrokona",
+    "name": "Netrokona",
+    "lat": 24.8812,
+    "lng": 90.7253,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-netrokona"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-thakurgaon",
+    "name": "Thakurgaon",
+    "lat": 26.0335,
+    "lng": 88.4602,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-thakurgaon"
+    ],
+    "aliases": [],
+    "interchange": false
+  },
+  {
+    "id": "bus-panchagarh",
+    "name": "Panchagarh",
+    "lat": 26.3410,
+    "lng": 88.5539,
+    "services": [
+      "intercity_bus"
+    ],
+    "datasetIds": [
+      "bd-panchagarh"
+    ],
+    "aliases": [],
+    "interchange": false
   }
 ];
 
@@ -4457,6 +4835,732 @@ export const LINES = [
             23.733836,
             90.403085
           ]
+        ]
+      }
+    ],
+  },
+  {
+    "id": "intercity-dhaka-chittagong",
+    "name": "Dhaka → Chittagong",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 250,
+    "stops": [
+      "metro-motijheel",
+      "bus-chittagong"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-chittagong",
+        "km": 250,
+        "geometry": [
+          [23.72743, 90.42018],
+          [22.3569, 91.7832]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-sylhet",
+    "name": "Dhaka → Sylhet",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 230,
+    "stops": [
+      "metro-motijheel",
+      "bus-sylhet"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-sylhet",
+        "km": 230,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.8949, 91.8687]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-khulna",
+    "name": "Dhaka → Khulna",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 340,
+    "stops": [
+      "metro-motijheel",
+      "bus-khulna"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-khulna",
+        "km": 340,
+        "geometry": [
+          [23.72743, 90.42018],
+          [22.8456, 89.5403]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-rajshahi",
+    "name": "Dhaka → Rajshahi",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 250,
+    "stops": [
+      "metro-motijheel",
+      "bus-rajshahi"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-rajshahi",
+        "km": 250,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.3745, 88.6042]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-barisal",
+    "name": "Dhaka → Barisal",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 150,
+    "stops": [
+      "metro-motijheel",
+      "bus-barisal"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-barisal",
+        "km": 150,
+        "geometry": [
+          [23.72743, 90.42018],
+          [22.7010, 90.3535]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-rangpur",
+    "name": "Dhaka → Rangpur",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 330,
+    "stops": [
+      "metro-motijheel",
+      "bus-rangpur"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-rangpur",
+        "km": 330,
+        "geometry": [
+          [23.72743, 90.42018],
+          [25.7558, 89.2544]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-mymensingh",
+    "name": "Dhaka → Mymensingh",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 120,
+    "stops": [
+      "metro-motijheel",
+      "bus-mymensingh"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-mymensingh",
+        "km": 120,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.7471, 90.4226]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-comilla",
+    "name": "Dhaka → Comilla",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 100,
+    "stops": [
+      "metro-motijheel",
+      "bus-comilla"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-comilla",
+        "km": 100,
+        "geometry": [
+          [23.72743, 90.42018],
+          [23.4683, 91.1802]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-bogra",
+    "name": "Dhaka → Bogra",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 190,
+    "stops": [
+      "metro-motijheel",
+      "bus-bogra"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-bogra",
+        "km": 190,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.8510, 89.3712]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-gazipur",
+    "name": "Dhaka → Gazipur",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 40,
+    "stops": [
+      "metro-motijheel",
+      "bus-gazipur"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-gazipur",
+        "km": 40,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.0023, 90.4265]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-narayanganj",
+    "name": "Dhaka → Narayanganj",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 30,
+    "stops": [
+      "metro-motijheel",
+      "bus-narayanganj"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-narayanganj",
+        "km": 30,
+        "geometry": [
+          [23.72743, 90.42018],
+          [23.6123, 90.4969]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-narsingdi",
+    "name": "Dhaka → Narsingdi",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 70,
+    "stops": [
+      "metro-motijheel",
+      "bus-narsingdi"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-narsingdi",
+        "km": 70,
+        "geometry": [
+          [23.72743, 90.42018],
+          [23.9228, 90.7224]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-tangail",
+    "name": "Dhaka → Tangail",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 90,
+    "stops": [
+      "metro-motijheel",
+      "bus-tangail"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-tangail",
+        "km": 90,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.2511, 89.9174]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-dhaka-jamalpur",
+    "name": "Dhaka → Jamalpur",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 140,
+    "stops": [
+      "metro-motijheel",
+      "bus-jamalpur"
+    ],
+    "hops": [
+      {
+        "from": "metro-motijheel",
+        "to": "bus-jamalpur",
+        "km": 140,
+        "geometry": [
+          [23.72743, 90.42018],
+          [24.9005, 89.9400]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-chittagong-comilla",
+    "name": "Chittagong → Comilla",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 180,
+    "stops": [
+      "bus-chittagong",
+      "bus-comilla"
+    ],
+    "hops": [
+      {
+        "from": "bus-chittagong",
+        "to": "bus-comilla",
+        "km": 180,
+        "geometry": [
+          [22.3569, 91.7832],
+          [23.4683, 91.1802]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-chittagong-coxs-bazar",
+    "name": "Chittagong → Cox's Bazar",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 150,
+    "stops": [
+      "bus-chittagong",
+      "bus-coxs-bazar"
+    ],
+    "hops": [
+      {
+        "from": "bus-chittagong",
+        "to": "bus-coxs-bazar",
+        "km": 150,
+        "geometry": [
+          [22.3569, 91.7832],
+          [21.4385, 92.0038]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-chittagong-feni",
+    "name": "Chittagong → Feni",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 50,
+    "stops": [
+      "bus-chittagong",
+      "bus-feni"
+    ],
+    "hops": [
+      {
+        "from": "bus-chittagong",
+        "to": "bus-feni",
+        "km": 50,
+        "geometry": [
+          [22.3569, 91.7832],
+          [23.0242, 91.3997]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-sylhet-mymensingh",
+    "name": "Sylhet → Mymensingh",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 190,
+    "stops": [
+      "bus-sylhet",
+      "bus-mymensingh"
+    ],
+    "hops": [
+      {
+        "from": "bus-sylhet",
+        "to": "bus-mymensingh",
+        "km": 190,
+        "geometry": [
+          [24.8949, 91.8687],
+          [24.7471, 90.4226]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-rajshahi-bogra",
+    "name": "Rajshahi → Bogra",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 130,
+    "stops": [
+      "bus-rajshahi",
+      "bus-bogra"
+    ],
+    "hops": [
+      {
+        "from": "bus-rajshahi",
+        "to": "bus-bogra",
+        "km": 130,
+        "geometry": [
+          [24.3745, 88.6042],
+          [24.8510, 89.3712]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-rajshahi-pabna",
+    "name": "Rajshahi → Pabna",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 90,
+    "stops": [
+      "bus-rajshahi",
+      "bus-pabna"
+    ],
+    "hops": [
+      {
+        "from": "bus-rajshahi",
+        "to": "bus-pabna",
+        "km": 90,
+        "geometry": [
+          [24.3745, 88.6042],
+          [24.0064, 89.2381]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-khulna-jessore",
+    "name": "Khulna → Jessore",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 60,
+    "stops": [
+      "bus-khulna",
+      "bus-jessore"
+    ],
+    "hops": [
+      {
+        "from": "bus-khulna",
+        "to": "bus-jessore",
+        "km": 60,
+        "geometry": [
+          [22.8456, 89.5403],
+          [23.1661, 89.2171]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-khulna-kushtia",
+    "name": "Khulna → Kushtia",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 110,
+    "stops": [
+      "bus-khulna",
+      "bus-kushtia"
+    ],
+    "hops": [
+      {
+        "from": "bus-khulna",
+        "to": "bus-kushtia",
+        "km": 110,
+        "geometry": [
+          [22.8456, 89.5403],
+          [23.9019, 89.1301]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-barisal-khulna",
+    "name": "Barisal → Khulna",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 160,
+    "stops": [
+      "bus-barisal",
+      "bus-khulna"
+    ],
+    "hops": [
+      {
+        "from": "bus-barisal",
+        "to": "bus-khulna",
+        "km": 160,
+        "geometry": [
+          [22.7010, 90.3535],
+          [22.8456, 89.5403]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-rangpur-dinajpur",
+    "name": "Rangpur → Dinajpur",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 100,
+    "stops": [
+      "bus-rangpur",
+      "bus-dinajpur"
+    ],
+    "hops": [
+      {
+        "from": "bus-rangpur",
+        "to": "bus-dinajpur",
+        "km": 100,
+        "geometry": [
+          [25.7558, 89.2544],
+          [25.6245, 88.6375]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-rangpur-saidpur",
+    "name": "Rangpur → Saidpur",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 40,
+    "stops": [
+      "bus-rangpur",
+      "bus-saidpur"
+    ],
+    "hops": [
+      {
+        "from": "bus-rangpur",
+        "to": "bus-saidpur",
+        "km": 40,
+        "geometry": [
+          [25.7558, 89.2544],
+          [25.7671, 88.9038]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-rangpur-gaibandha",
+    "name": "Rangpur → Gaibandha",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 70,
+    "stops": [
+      "bus-rangpur",
+      "bus-gaibandha"
+    ],
+    "hops": [
+      {
+        "from": "bus-rangpur",
+        "to": "bus-gaibandha",
+        "km": 70,
+        "geometry": [
+          [25.7558, 89.2544],
+          [25.3242, 89.5394]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-bogra-sirajganj",
+    "name": "Bogra → Sirajganj",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 70,
+    "stops": [
+      "bus-bogra",
+      "bus-sirajganj"
+    ],
+    "hops": [
+      {
+        "from": "bus-bogra",
+        "to": "bus-sirajganj",
+        "km": 70,
+        "geometry": [
+          [24.8510, 89.3712],
+          [24.4531, 89.7107]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-comilla-noakhali",
+    "name": "Comilla → Noakhali",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 90,
+    "stops": [
+      "bus-comilla",
+      "bus-noakhali"
+    ],
+    "hops": [
+      {
+        "from": "bus-comilla",
+        "to": "bus-noakhali",
+        "km": 90,
+        "geometry": [
+          [23.4683, 91.1802],
+          [22.8129, 91.0884]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-mymensingh-jamalpur",
+    "name": "Mymensingh → Jamalpur",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 60,
+    "stops": [
+      "bus-mymensingh",
+      "bus-jamalpur"
+    ],
+    "hops": [
+      {
+        "from": "bus-mymensingh",
+        "to": "bus-jamalpur",
+        "km": 60,
+        "geometry": [
+          [24.7471, 90.4226],
+          [24.9005, 89.9400]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-narayanganj-narsingdi",
+    "name": "Narayanganj → Narsingdi",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 40,
+    "stops": [
+      "bus-narayanganj",
+      "bus-narsingdi"
+    ],
+    "hops": [
+      {
+        "from": "bus-narayanganj",
+        "to": "bus-narsingdi",
+        "km": 40,
+        "geometry": [
+          [23.6123, 90.4969],
+          [23.9228, 90.7224]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-mymensingh-netrokona",
+    "name": "Mymensingh → Netrokona",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 50,
+    "stops": [
+      "bus-mymensingh",
+      "bus-netrokona"
+    ],
+    "hops": [
+      {
+        "from": "bus-mymensingh",
+        "to": "bus-netrokona",
+        "km": 50,
+        "geometry": [
+          [24.7471, 90.4226],
+          [24.8812, 90.7253]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-rangpur-thakurgaon",
+    "name": "Rangpur → Thakurgaon",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 120,
+    "stops": [
+      "bus-rangpur",
+      "bus-thakurgaon"
+    ],
+    "hops": [
+      {
+        "from": "bus-rangpur",
+        "to": "bus-thakurgaon",
+        "km": 120,
+        "geometry": [
+          [25.7558, 89.2544],
+          [26.0335, 88.4602]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intercity-thakurgaon-panchagarh",
+    "name": "Thakurgaon → Panchagarh",
+    "service": "intercity_bus",
+    "mode": "bus",
+    "totalKm": 50,
+    "stops": [
+      "bus-thakurgaon",
+      "bus-panchagarh"
+    ],
+    "hops": [
+      {
+        "from": "bus-thakurgaon",
+        "to": "bus-panchagarh",
+        "km": 50,
+        "geometry": [
+          [26.0335, 88.4602],
+          [26.3410, 88.5539]
         ]
       }
     ]
