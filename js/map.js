@@ -16,6 +16,19 @@ const MODE_HEX = {
   default: '#64748b'
 };
 
+const ROUTE_COLORS = [
+  '#22B07D', '#D98E04', '#006747', '#2563EB', '#7C3AED', '#DB2777',
+  '#0891B2', '#059669', '#B45309', '#BE185D'
+];
+
+function routeColorFor(card) {
+  let hash = 0;
+  for (let index = 0; index < String(card.id).length; index += 1) {
+    hash = ((hash << 5) - hash + String(card.id).charCodeAt(index)) | 0;
+  }
+  return ROUTE_COLORS[Math.abs(hash) % ROUTE_COLORS.length];
+}
+
 const STATUS_COLORS = {
   normal: '#22B07D',
   ok: '#22B07D',
@@ -73,7 +86,7 @@ function routeGeoJson(card) {
       type: 'Feature',
       properties: {
         id: `${card.id}:${leg.from}>${leg.to}`,
-        color: asHex(MODE_COLORS[leg.mode] || MODE_HEX.default),
+        color: routeColorFor(card),
         mode: leg.mode,
         name: `${from?.name || leg.from} → ${to?.name || leg.to}`
       },

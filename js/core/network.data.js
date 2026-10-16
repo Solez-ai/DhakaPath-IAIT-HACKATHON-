@@ -2559,7 +2559,8 @@ export const LINES = [
       "bikolpo-kalabagan",
       "bikolpo-labaid",
       "bikolpo-new-market",
-      "bikolpo-tsc"
+      "bikolpo-tsc",
+      "metro-motijheel"
     ],
     "hops": [
       {
@@ -3536,6 +3537,15 @@ export const LINES = [
             90.394696
           ]
         ]
+      },
+      {
+        "from": "bikolpo-tsc",
+        "to": "metro-motijheel",
+        "km": 2.3,
+        "geometry": [
+          [23.732855, 90.394696],
+          [23.72743, 90.42018]
+        ]
       }
     ]
   },
@@ -3565,7 +3575,8 @@ export const LINES = [
       "uttara-bus-sheraton",
       "metro-shahbagh",
       "uttara-bus-kakrail",
-      "metro-bangladesh-secretariat"
+      "metro-bangladesh-secretariat",
+      "metro-motijheel"
     ],
     "hops": [
       {
@@ -4836,8 +4847,17 @@ export const LINES = [
             90.403085
           ]
         ]
+      },
+      {
+        "from": "metro-bangladesh-secretariat",
+        "to": "metro-motijheel",
+        "km": 1.286,
+        "geometry": [
+          [23.73001, 90.40787],
+          [23.72743, 90.42018]
+        ]
       }
-    ],
+    ]
   },
   {
     "id": "intercity-dhaka-chittagong",
