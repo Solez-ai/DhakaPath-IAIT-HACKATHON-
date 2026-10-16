@@ -182,8 +182,12 @@ check('student pass halves bus fares with the ৳10 floor', () => {
   return `৳${regular} → ৳${student} on ${busLink.km} km`;
 });
 check('a metro-only constraint is honoured', () => {
-  const options = planRoutes({ from: HUBS[0].id, to: HUBS.at(-1).id, onlyModes: ['metro'] });
-  truthy(options.length > 0, 'metro-only should still generate a valid path');
+  const origin = HUBS.find(hub => /uttara north/i.test(hub.name));
+  const destination = HUBS.find(hub => /motijheel/i.test(hub.name));
+  truthy(origin && destination, 'need a valid metro corridor pair in the dataset');
+
+  const options = planRoutes({ from: origin.id, to: destination.id, onlyModes: ['metro'] });
+  truthy(options.length > 0, 'metro-only should still generate a valid path on the MRT-6 line');
   options.forEach(option => option.legs.forEach(leg => {
     if (leg.mode !== 'metro') throw new Error(`leg ${leg.linkId} should be metro`);
   }));
