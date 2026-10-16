@@ -233,6 +233,8 @@ function drawHubs(map) {
 }
 
 function updateLayerButton() {
+  if (typeof document === 'undefined') return;
+
   const button = document.getElementById('layerToggleBtn');
   const visible = state.showDisruptedHubs;
   if (button) {

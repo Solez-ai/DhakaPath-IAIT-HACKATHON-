@@ -11,7 +11,7 @@ Gemini free tier (optional, server-side only). No paid APIs, no card-gated servi
 
 ---
 
-## 1. Run it locally (the way the judges will)
+## 1. Run it locally
 
 Requirements: **Node 18+** (uses global `fetch`). Nothing to install — there are no dependencies.
 
@@ -62,7 +62,7 @@ curl -s localhost:8000/api/config
 
 ---
 
-## 2. What to look at (feature map, by judged part)
+## 2. Feature map
 
 | Part | Where it lives in the UI | What to try |
 |---|---|---|
@@ -93,7 +93,7 @@ labelled where it appears. Live pieces: Open-Meteo weather and OpenStreetMap til
 
 ---
 
-## 3. Architecture in one screen
+## 3. Architecture overview
 
 ```
 index.html            markup + `data-action` hooks (no inline handlers) + `data-i18n` labels
