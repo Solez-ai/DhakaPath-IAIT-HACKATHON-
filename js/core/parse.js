@@ -48,18 +48,62 @@ const normalize = value => (value || '').replace(/\s+/g, ' ').trim();
 /* Resolve a hub mention to a hub id, longest token first so "Mirpur 10" wins
    over "Mirpur 11" when both could match. */
 export function matchHubs(text) {
-  const lowered = ` ${normalize(text).toLowerCase()} `;
+  const query = normalize(text).toLowerCase();
+  if (!query) return [];
+
   const found = [];
-  const used = [];
+  const seen = new Set();
 
   searchTokens().forEach(entry => {
-    if (!lowered.includes(entry.token)) return;
-    if (used.some(range => range.token === entry.token)) return;
-    used.push(entry);
+    const token = String(entry.token || '').toLowerCase();
+    const hub = HUB_BY_ID.get(entry.hubId);
+    if (!hub) return;
+
+    const names = [hub.name, ...(hub.aliases || [])].map(name => String(name).toLowerCase());
+    const isMatch = names.some(name =>
+      name === query ||
+      name.includes(query) ||
+      query.includes(name) ||
+      name.startsWith(query) ||
+      query.startsWith(name) ||
+      token === query ||
+      token.startsWith(query) ||
+      query.startsWith(token)
+    );
+
+    if (!isMatch || seen.has(entry.hubId)) return;
+    seen.add(entry.hubId);
     found.push(entry.hubId);
   });
 
-  return [...new Set(found)];
+  return found;
+}
+
+export function suggestHubs(text, limit = 6) {
+  const query = normalize(text).toLowerCase();
+  if (!query) return [];
+
+  const ranked = [];
+  HUBS.forEach(entry => {
+    const name = entry.name.toLowerCase();
+    const aliases = (entry.aliases || []).map(alias => alias.toLowerCase());
+    let score = 0;
+
+    if (name === query) score = 100;
+    else if (name.startsWith(query)) score = 90;
+    else if (name.includes(query)) score = 70;
+    else if (aliases.some(alias => alias === query)) score = 85;
+    else if (aliases.some(alias => alias.startsWith(query) || alias.includes(query))) score = 60;
+
+    if (score > 0) {
+      ranked.push({ name: entry.name, score, hubId: entry.id });
+    }
+  });
+
+  return ranked
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, limit)
+    .map(entry => entry.name);
 }
 
 function extractNodes(text) {

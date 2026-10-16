@@ -1,4 +1,4 @@
-import { FARE_RULES, HUB_BY_ID, LINK_BY_ID, linksFrom, LINES_INFO } from './network.js';
+import { FARE_RULES, HUB_BY_ID, LINK_BY_ID, LINKS, linksFrom, LINES_INFO } from './network.js';
 import { applySegmentFares, fareForDistance, totalFare, modeLabel, rulesFor } from './fares.js';
 import { linkStatus, linkUsable, scenarioActive, scenarioEffects, timeMultiplier } from './scenario.js';
 
@@ -121,7 +121,10 @@ function allowed(link, query) {
   if (!linkUsable(link, query.scenario)) return false;           // disruption / closure
   if (query.avoidHubs?.includes(link.from) || query.avoidHubs?.includes(link.to)) return false;
   if (query.avoidModes?.includes(link.mode)) return false;
-  if (query.onlyModes?.length && !query.onlyModes.includes(link.mode)) return false;
+  if (query.onlyModes?.length) {
+    if (link.mode === 'walk') return false;
+    if (!query.onlyModes.includes(link.mode)) return false;
+  }
   return true;
 }
 
@@ -295,7 +298,7 @@ export function planRoutes(query) {
     onlyModes: query.onlyModes || [],
     maxFare: query.maxFare ?? null,
     bannedLinks: query.bannedLinks || null,
-    limit: query.limit || 4
+    limit: Number.isFinite(Number(query.limit)) ? Number(query.limit) : 12
   };
 
   if (!normalised.from || !normalised.to || normalised.from === normalised.to) return [];
@@ -316,18 +319,88 @@ export function planRoutes(query) {
 
   PREFERENCES.forEach(preference => openOption(searchLegs(normalised, preference), preference));
 
-  // Alternatives: drop one hop of the fastest route at a time and search again.
   const primary = bySignature.values().next().value || null;
-  if (primary) {
-    primary.legs.forEach(leg => {
-      const bannedLinks = new Set([leg.linkId, `${leg.linkId.split(':')[0] === 'walk' ? 'walk' : leg.lineId}:${leg.to}>${leg.from}`]);
-      const legs = searchLegs({ ...normalised, bannedLinks }, 'time');
-      if (!legs) return;
-      const option = buildOption(legs, 'alternate', normalised);
-      if (bySignature.has(option.signature)) return;
-      option.tags = [`Avoids ${HUB_BY_ID.get(leg.from).name} → ${HUB_BY_ID.get(leg.to).name}`];
+  const minimumOptions = Math.max(8, normalised.limit);
+  const addAlternate = (legs, tag) => {
+    if (!legs) return;
+    const option = buildOption(legs, 'alternate', normalised);
+    if (!bySignature.has(option.signature)) {
+      option.tags = [tag];
       bySignature.set(option.signature, option);
+    }
+  };
+
+  if (primary) {
+    primary.legs.forEach((leg, index) => {
+      if (!leg.linkId) return;
+      const bannedLinks = new Set([leg.linkId, `${leg.lineId}:${leg.to}>${leg.from}`]);
+      const legs = searchLegs({ ...normalised, bannedLinks }, 'time');
+      addAlternate(legs, `Alternate ${index + 1}`);
+      if (bySignature.size >= minimumOptions) return;
     });
+
+    if (bySignature.size < minimumOptions) {
+      const seenLineIds = new Set();
+      primary.legs.forEach(leg => {
+        if (!leg.lineId || seenLineIds.has(leg.lineId)) return;
+        seenLineIds.add(leg.lineId);
+        const bannedLinks = new Set(
+          LINKS.filter(link => link.lineId === leg.lineId).map(link => link.id)
+        );
+        const legs = searchLegs({ ...normalised, bannedLinks }, 'time');
+        addAlternate(legs, `Avoids ${leg.routeName}`);
+        if (bySignature.size >= minimumOptions) return;
+      });
+    }
+
+    if (bySignature.size < minimumOptions) {
+      const seenHubs = new Set();
+      primary.legs.forEach(leg => {
+        const hubIds = [leg.from, leg.to];
+        hubIds.forEach(hubId => {
+          if (!hubId || seenHubs.has(hubId)) return;
+          seenHubs.add(hubId);
+          const legs = searchLegs({ ...normalised, avoidHubs: [...normalised.avoidHubs, hubId] }, 'time');
+          addAlternate(legs, `Detour via ${HUB_BY_ID.get(hubId)?.name || hubId}`);
+          if (bySignature.size >= minimumOptions) return;
+        });
+        if (bySignature.size >= minimumOptions) return;
+      });
+    }
+  }
+
+  if (bySignature.size < minimumOptions) {
+    const modePatterns = [
+      ['metro'],
+      ['bus'],
+      ['metro', 'walk'],
+      ['bus', 'walk'],
+      ['walk']
+    ];
+
+    for (const onlyModes of modePatterns) {
+      const legs = searchLegs({ ...normalised, onlyModes }, 'time');
+      addAlternate(legs, `${onlyModes.join('+')} only`);
+      if (bySignature.size >= minimumOptions) break;
+    }
+  }
+
+  if (bySignature.size < minimumOptions) {
+    const corridorHubs = [...new Set((primary?.legs || []).map(leg => leg.from))];
+    const joinHubs = corridorHubs.slice(1, Math.min(8, corridorHubs.length));
+    const modePairs = [['bus', 'metro'], ['metro', 'bus'], ['walk', 'metro'], ['metro', 'walk']];
+
+    for (const hubId of joinHubs) {
+      for (const [prefixMode, suffixMode] of modePairs) {
+        const prefix = searchLegs({ ...normalised, from: normalised.from, to: hubId, onlyModes: [prefixMode] }, 'time');
+        const suffix = searchLegs({ ...normalised, from: hubId, to: normalised.to, onlyModes: [suffixMode] }, 'time');
+        if (!prefix || !suffix || prefix.length === 0 || suffix.length === 0) continue;
+        const combined = [...prefix, ...suffix.slice(1)];
+        addAlternate(combined, `Connect via ${HUB_BY_ID.get(hubId)?.name || hubId} (${prefixMode} → ${suffixMode})`);
+        if (bySignature.size >= minimumOptions) break;
+      }
+      if (bySignature.size >= minimumOptions) break;
+    }
   }
 
   let options = [...bySignature.values()];
@@ -340,7 +413,7 @@ export function planRoutes(query) {
   const requested = query.prefer || 'time';
   options.sort((a, b) => (rank(a, requested) - rank(b, requested)) || (b.reliability - a.reliability));
 
-  return options.slice(0, normalised.limit);
+  return options.slice(0, minimumOptions);
 }
 
 /* Planner entry point used by the UI, the chat and the tests. */

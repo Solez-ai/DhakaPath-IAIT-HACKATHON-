@@ -183,9 +183,25 @@ check('student pass halves bus fares with the ৳10 floor', () => {
 });
 check('a metro-only constraint is honoured', () => {
   const options = planRoutes({ from: HUBS[0].id, to: HUBS.at(-1).id, onlyModes: ['metro'] });
+  truthy(options.length > 0, 'metro-only should still generate a valid path');
   options.forEach(option => option.legs.forEach(leg => {
     if (leg.mode !== 'metro') throw new Error(`leg ${leg.linkId} should be metro`);
   }));
+});
+check('the default route pool is broad enough to cover the dataset corridor network', () => {
+  const from = 'metro-mirpur-10';
+  const to = 'metro-motijheel';
+  const plan = planTrip({ from, to, prefer: 'time' }, null);
+  truthy(plan.options.length >= 6, `expected at least 6 route options from the live dataset, got ${plan.options.length}`);
+  return `${plan.options.length} options from ${from} → ${to}`;
+});
+check('selected routes use the real Map Data corridor geometry rather than straight hub lines', () => {
+  const plan = planTrip({ from: 'metro-mirpur-10', to: 'metro-motijheel', prefer: 'time' }, null);
+  truthy(plan.options.length > 0, 'expected at least one route');
+  const firstLeg = plan.options[0].legs[0];
+  const link = LINK_BY_ID.get(firstLeg.linkId);
+  truthy(link && Array.isArray(link.geometry) && link.geometry.length >= 2, 'first leg should carry real geometry from Map Data');
+  return `${link.routeName} with ${link.geometry.length} geometry points`;
 });
 check('selected routes focus the map and draw route highlights', () => {
   const { state, mapContext } = loaded['state'] || {};
@@ -282,6 +298,28 @@ check('a clean crowd report is accepted', () => {
   const outcome = sanityCheck({ hubId: HUBS[0].id, type: 'gridlock', severity: 3, description: 'Test report', reporter: 'smoke' });
   equal(outcome.ok, true);
   equal(outcome.action, 'accept');
+});
+check('confirming or clearing a report refreshes the live alert board', () => {
+  const { state, addReport, confirmDisplayedAlert, resolveDisplayedAlert, displayReports } = loaded['state'] || {};
+  truthy(state && addReport && confirmDisplayedAlert && resolveDisplayedAlert && displayReports, 'alert state helpers should be available');
+
+  const report = addReport({ hubId: HUBS[0].id, type: 'gridlock', severity: 3, description: 'Refresh test report', reporter: 'smoke' });
+  truthy(report.alert, 'report should have been added');
+
+  state.alerts = displayReports();
+  const before = state.alerts.some(card => card.id === report.alert.id);
+  truthy(before, 'the new report should appear in the live alert list');
+
+  confirmDisplayedAlert(report.alert.id);
+  state.alerts = displayReports();
+  const afterConfirm = state.alerts.some(card => card.id === report.alert.id);
+  truthy(afterConfirm, 'confirming should keep the alert visible in the live board');
+
+  resolveDisplayedAlert(report.alert.id);
+  state.alerts = displayReports();
+  const afterResolve = state.alerts.some(card => card.id === report.alert.id);
+  equal(afterResolve, false, 'clearing an alert should remove it from the active board');
+  return 'board state reflects report confirmations and clears';
 });
 check('an unknown hub is rejected', () => {
   const outcome = sanityCheck({ hubId: 'no-such-hub', type: 'gridlock', severity: 3 });

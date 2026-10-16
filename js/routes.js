@@ -9,7 +9,7 @@ import { HUBS, FARE_RULES } from './core/network.js';
    comes from the planner (core/router.js), which prices the journey with the
    official rates and validates every leg against the dataset graph. */
 
-const money = value => `৳${value}`;
+const money = value => `৳${Number.isFinite(Number(value)) ? Number(value) : 0}`;
 
 const TAG_TONES = {
   CHEAPEST: 'bg-ok/10 text-ok border-ok/30',
@@ -152,9 +152,23 @@ export function renderRouteRibbon() {
 }
 
 export function selectRoute(routeId) {
-  if (!routeId) return;
-  state.selectedRouteId = routeId;
-  state.routes.forEach(card => { card.selected = card.id === routeId; });
+  if (!routeId) {
+    state.selectedRouteId = null;
+    state.routes.forEach(card => { card.selected = false; });
+    renderRoutes();
+    renderRouteRibbon();
+    refreshMap();
+    return;
+  }
+
+  if (state.selectedRouteId === routeId) {
+    state.selectedRouteId = null;
+    state.routes.forEach(card => { card.selected = false; });
+  } else {
+    state.selectedRouteId = routeId;
+    state.routes.forEach(card => { card.selected = card.id === routeId; });
+  }
+
   renderRoutes();
   renderRouteRibbon();
   refreshMap();

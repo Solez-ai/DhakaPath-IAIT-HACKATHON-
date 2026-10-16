@@ -1,7 +1,35 @@
 import { state } from './state.js';
-import { parseQuery, CHIP_TONES } from './core/parse.js';
+import { parseQuery, CHIP_TONES, suggestHubs } from './core/parse.js';
 import { HUB_BY_ID, HUBS } from './core/network.js';
 import { renderRoutes } from './routes.js';
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function updateSearchSuggestions(raw = '') {
+  const input = document.getElementById('searchInput') || document.getElementById('mobileSearchInput');
+  const datalist = document.getElementById('searchSuggestions') || document.createElement('datalist');
+
+  if (!input) return;
+
+  datalist.id = 'searchSuggestions';
+  const trimmed = String(raw || '').trim();
+  const suggestions = trimmed.length >= 2 ? suggestHubs(trimmed, 6) : [];
+
+  datalist.innerHTML = suggestions.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
+
+  if (!document.getElementById('searchSuggestions')) {
+    input.parentNode?.appendChild(datalist);
+  }
+
+  input.setAttribute('list', 'searchSuggestions');
+}
 
 /* ===============================
    Intent-aware search
@@ -67,6 +95,7 @@ export function renderIntentChips(tokens, notice) {
 }
 
 export function handleSearchInput(value) {
+  updateSearchSuggestions(value);
   const { parsed, notice } = applyParsedQuery(value);
   renderIntentChips(parsed.tokens, notice);
 }

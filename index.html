@@ -11,9 +11,9 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Leaflet Map CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- MapLibre GL JS + OpenFreeMap -->
+  <link href="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js"></script>
 
   <!-- Custom Fonts: Schibsted Grotesk, Hanken Grotesk, Geist Mono, Hind Siliguri -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,10 +108,11 @@
           <div class="space-y-2">
             <label class="block text-xs font-semibold uppercase tracking-wider text-ink-2" data-i18n="search.label">Intent-Aware Search</label>
             <div class="relative">
-              <input type="text" id="searchInput" data-action="search-input" data-i18n-placeholder="search.placeholder" placeholder="e.g. Mirpur to Motijheel, student fare..." class="w-full bg-paper border border-line-strong rounded-md px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal font-body">
+              <input type="text" id="searchInput" data-action="search-input" data-i18n-placeholder="search.placeholder" list="searchSuggestions" placeholder="e.g. Mirpur to Motijheel, student fare..." class="w-full bg-paper border border-line-strong rounded-md px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-signal font-body">
               <button data-action="execute-search" class="absolute right-1.5 top-1.5 bg-signal text-signal-ink rounded px-2.5 py-1 text-xs font-medium hover:bg-opacity-90">
                 Go
               </button>
+              <datalist id="searchSuggestions"></datalist>
             </div>
             <!-- Parsed Intent Chips -->
             <div id="intentChips" class="flex flex-wrap gap-1.5 min-h-[22px]">
@@ -482,7 +483,7 @@
       <div id="map" class="w-full h-full map-container"></div>
 
       <!-- Floating Map Control Cluster -->
-      <div class="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
+      <div class="absolute top-3 right-3 z-[1001] flex flex-col gap-2 pointer-events-auto">
         <button data-action="center-location" class="w-9 h-9 rounded-md bg-surface text-ink border border-line shadow-md flex items-center justify-center hover:bg-surface-2 transition-colors" title="Locate Me">
           <i class="fa-solid fa-location-crosshairs text-sm text-signal"></i>
         </button>

@@ -1,4 +1,4 @@
-import { state, addReport, confirmDisplayedAlert, resolveDisplayedAlert, activeAlerts } from './state.js';
+import { state, addReport, confirmDisplayedAlert, resolveDisplayedAlert, activeAlerts, displayReports } from './state.js';
 import { ALERT_TYPES } from './core/alerts.js';
 import { matchHubs } from './core/parse.js';
 import { HUB_BY_ID, HUBS } from './core/network.js';
@@ -41,6 +41,8 @@ function alertStyle(type) {
 }
 
 export function renderAlerts() {
+  state.alerts = displayReports();
+
   const container = document.getElementById('alertsList');
   if (container) {
     container.innerHTML = state.alerts.map(alertCard).join('');
@@ -156,11 +158,13 @@ export function renderFeed() {
 /* Alert lifecycle actions */
 export function confirmAlertById(id) {
   confirmDisplayedAlert(id);
+  state.alerts = displayReports();
   renderAlerts();
 }
 
 export function resolveAlertById(id) {
   resolveDisplayedAlert(id);
+  state.alerts = displayReports();
   renderAlerts();
 }
 

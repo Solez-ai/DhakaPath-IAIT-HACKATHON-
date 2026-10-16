@@ -17,7 +17,7 @@ import { checkQuote, bargainingScript } from './core/fareCoach.js';
         ৳10 minimum floor. MRT-6 has no student fare, and the ledger says so
         instead of quietly discounting it. */
 
-const money = value => `৳${value}`;
+const money = value => `৳${Number.isFinite(Number(value)) ? Number(value) : 0}`;
 
 export function initFareCalculator() {
   const from = document.getElementById('fareFrom');
@@ -30,8 +30,8 @@ export function initFareCalculator() {
   from.innerHTML = options;
   to.innerHTML = options;
 
-  from.value = keepFrom || 'mirpur-10';
-  to.value = keepTo || 'motijheel';
+  from.value = keepFrom || 'metro-mirpur-10';
+  to.value = keepTo || 'metro-motijheel';
 
   renderFareChart();
   renderFareTable();
@@ -86,14 +86,15 @@ function legRow(leg, student) {
   const fare = leg.fareValue;
   const studentFare = leg.studentFare;
   const covered = Boolean(leg.includedIn);
+  const safeMoney = value => money(Number.isFinite(Number(value)) ? Number(value) : 0);
   return `
     <tr class="border-t border-line align-top">
       <td class="py-1.5">
         <p class="text-[11px] text-ink"><i class="fa-solid ${leg.modeKey === 'walk' ? 'fa-person-walking' : leg.modeKey === 'metro' ? 'fa-train-subway' : 'fa-bus'} me-1" style="color:${leg.color}"></i>${leg.line}</p>
         <p class="text-[10px] text-ink-3">${leg.from} → ${leg.to} · ${leg.km} km · ${leg.time}</p>
       </td>
-      <td class="text-right font-mono text-[11px] text-ink">${covered ? '<span class="text-ink-3">included</span>' : money(fare)}</td>
-      <td class="text-right font-mono text-[11px] ${student && studentFare < fare ? 'text-ok' : 'text-ink-2'}">${covered ? '' : money(studentFare)}</td>
+      <td class="text-right font-mono text-[11px] text-ink">${covered ? '<span class="text-ink-3">included</span>' : safeMoney(fare)}</td>
+      <td class="text-right font-mono text-[11px] ${student && Number(studentFare) < Number(fare) ? 'text-ok' : 'text-ink-2'}">${covered ? '' : safeMoney(studentFare)}</td>
     </tr>`;
 }
 
@@ -114,16 +115,18 @@ export function renderFareTable() {
     return;
   }
 
-  const plan = planEndpoints(fromId, toId, { prefer: 'cost', student: false, limit: 3 });
+  const plan = planEndpoints(fromId, toId, { prefer: 'cost', student: false, limit: 12 });
   const chart = state.fareChart || metroFareChart();
 
   if (!plan.options.length) {
-    host.innerHTML = `<p class="text-[11px] text-warn">No connected journey between ${HUB_BY_ID.get(fromId).name} and ${HUB_BY_ID.get(toId).name} in the dataset.</p>`;
+    const fromHub = HUB_BY_ID.get(fromId);
+    const toHub = HUB_BY_ID.get(toId);
+    host.innerHTML = `<p class="text-[11px] text-warn">No connected journey between ${(fromHub && fromHub.name) || fromId} and ${(toHub && toHub.name) || toId} in the dataset.</p>`;
     if (badge) badge.textContent = 'not connected';
     return;
   }
 
-  const cheapest = [...plan.options].sort((a, b) => a.fare.regular - b.fare.regular)[0];
+  const cheapest = [...plan.options].sort((a, b) => (a.fare?.regular ?? 0) - (b.fare?.regular ?? 0))[0] || { fare: { regular: 0, student: 0 }, legs: [], timeMin: 0, transfers: 0 };
   const studentPlan = planEndpoints(fromId, toId, { prefer: 'cost', student: true, limit: 1 }).options[0] || cheapest;
   const regularPlan = planEndpoints(fromId, toId, { prefer: 'cost', student: false, limit: 1 }).options[0] || cheapest;
 
@@ -131,7 +134,7 @@ export function renderFareTable() {
     ? chart.fareBetween(fromId, toId)
     : null;
 
-  const saving = regularPlan.fare.regular - studentPlan.fare.student;
+  const saving = Number(regularPlan.fare?.regular ?? 0) - Number(studentPlan.fare?.student ?? 0);
 
   host.innerHTML = `
     <div class="border border-line rounded bg-surface p-2 space-y-2">

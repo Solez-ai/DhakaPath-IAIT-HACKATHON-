@@ -24,6 +24,12 @@ import {
    model's own prediction, which is labelled as such. */
 
 const START = Date.now();
+const DEFAULT_ROUTE_LIMIT = 20;
+
+const safeNumber = (value, fallback = 0) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+};
 
 export const state = {
   theme: 'light',
@@ -129,7 +135,7 @@ export function displayReport(report, now = Date.now()) {
 
 export function displayReports(now = Date.now()) {
   return state.reportStore
-    .filter(entry => freshness(entry, now).status !== 'expired')
+    .filter(entry => entry.status === 'active' && freshness(entry, now).status !== 'expired')
     .map(entry => displayReport(entry, now))
     .sort((a, b) => {
       if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
@@ -253,9 +259,15 @@ export function syncPredictedReports(now = Date.now()) {
     });
   });
 
-  if (!byLink.size) return 0;
+  const modelAlerts = state.reportStore.filter(entry => entry.source === 'model' && entry.status === 'active');
+  if (modelAlerts.length > 4) {
+    const keepIds = new Set(modelAlerts.slice(-4).map(entry => entry.id));
+    state.reportStore = state.reportStore.filter(entry => !entry.source || entry.source !== 'model' || keepIds.has(entry.id));
+  }
 
-  const predictions = predictedAlerts(byLink, { now, threshold: 0.65 });
+  if (!byLink.size) return state.reportStore.filter(entry => entry.source === 'model').length;
+
+  const predictions = predictedAlerts(byLink, { now, threshold: 0.65 }).slice(0, 4);
   let added = 0;
 
   predictions.forEach(prediction => {
@@ -265,10 +277,23 @@ export function syncPredictedReports(now = Date.now()) {
       existing.updatedAt = new Date(now).toISOString();
       return;
     }
+    if (state.reportStore.filter(entry => entry.source === 'model' && entry.status === 'active').length >= 4) {
+      const oldest = state.reportStore.filter(entry => entry.source === 'model' && entry.status === 'active').sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))[0];
+      if (oldest) {
+        state.reportStore = state.reportStore.filter(entry => entry.id !== oldest.id);
+      }
+    }
     state.reportStore.unshift(prediction);
     added += 1;
     logEntry('predicted', `Monsoon Shield predicts waterlogging on ${LINK_BY_ID.get(prediction.linkId)?.routeName || prediction.linkId} from ${corridors.get('bikolpo')?.reason || 'forecast rainfall'}.`, { id: prediction.id });
   });
+
+  const modelCount = state.reportStore.filter(entry => entry.source === 'model' && entry.status === 'active').length;
+  if (modelCount > 4) {
+    const trimmed = state.reportStore.filter(entry => entry.source === 'model' && entry.status === 'active').sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt)).slice(0, 4);
+    const keepIds = new Set(trimmed.map(entry => entry.id));
+    state.reportStore = state.reportStore.filter(entry => entry.source !== 'model' || keepIds.has(entry.id));
+  }
 
   return added;
 }
@@ -321,31 +346,36 @@ function notesFor(option) {
 }
 
 export function toRouteCard(option, arrival, selected, deltas = null) {
-  const legs = option.legs.map(leg => ({
-    modeKey: leg.mode,
-    mode: FARE_RULES[leg.mode].label,
-    line: leg.routeName,
-    from: HUB_BY_ID.get(leg.from).name,
-    to: HUB_BY_ID.get(leg.to).name,
-    fromId: leg.from,
-    toId: leg.to,
-    time: `${leg.timeMin} min`,
-    timeMin: leg.timeMin,
-    waitMin: leg.waitMin,
-    km: leg.km,
-    fare: leg.fare,
-    fareValue: leg.fare.regular,
-    studentFare: leg.fare.student,
-    includedIn: leg.fare.includedIn || null,
-    isTransfer: leg.isTransfer,
-    color: MODE_COLORS[leg.mode],
-    icon: MODE_GLYPHS[leg.mode],
-    board: leg.board,
-    alight: leg.alight,
-    why: leg.why,
-    status: leg.status,
-    dataset: leg.dataset
-  }));
+  const legs = option.legs.map(leg => {
+    const fromHub = HUB_BY_ID.get(leg.from);
+    const toHub = HUB_BY_ID.get(leg.to);
+    const fare = leg.fare || {};
+    return {
+      modeKey: leg.mode,
+      mode: FARE_RULES[leg.mode].label,
+      line: leg.routeName,
+      from: fromHub ? fromHub.name : leg.from,
+      to: toHub ? toHub.name : leg.to,
+      fromId: leg.from,
+      toId: leg.to,
+      time: `${leg.timeMin} min`,
+      timeMin: safeNumber(leg.timeMin, 0),
+      waitMin: safeNumber(leg.waitMin, 0),
+      km: safeNumber(leg.km, 0),
+      fare,
+      fareValue: safeNumber(fare.regular ?? leg.fareValue ?? 0, 0),
+      studentFare: safeNumber(fare.student ?? leg.studentFare ?? 0, 0),
+      includedIn: fare.includedIn || null,
+      isTransfer: leg.isTransfer,
+      color: MODE_COLORS[leg.mode],
+      icon: MODE_GLYPHS[leg.mode],
+      board: leg.board,
+      alight: leg.alight,
+      why: leg.why,
+      status: leg.status,
+      dataset: leg.dataset
+    };
+  });
 
   return {
     id: option.signature,
@@ -353,10 +383,10 @@ export function toRouteCard(option, arrival, selected, deltas = null) {
     title: titleFor(option),
     tag: (option.tags?.[0] || option.preference).toUpperCase(),
     tags: option.tags || [],
-    timeMinutes: option.timeMin,
-    walkMinutes: option.walkMin,
-    baseFare: option.fare.regular,
-    studentFare: option.fare.student,
+    timeMinutes: safeNumber(option.timeMin, 0),
+    walkMinutes: safeNumber(option.walkMin, 0),
+    baseFare: safeNumber(option.fare?.regular ?? 0, 0),
+    studentFare: safeNumber(option.fare?.student ?? 0, 0),
     transfers: option.transfers,
     reliability: option.reliability,
     notes: notesFor(option),
@@ -371,8 +401,8 @@ export function toRouteCard(option, arrival, selected, deltas = null) {
 
 export function refreshRoutePlan({ now = Date.now() } = {}) {
   const intent = state.search;
-  const from = intent.origin || 'mirpur-10';
-  const to = intent.destination || 'motijheel';
+  const from = intent.origin || 'metro-mirpur-10';
+  const to = intent.destination || 'metro-motijheel';
   const featured = !intent.origin && !intent.destination;
 
   const query = {
@@ -384,7 +414,7 @@ export function refreshRoutePlan({ now = Date.now() } = {}) {
     avoidHubs: intent.avoidHubs,
     avoidModes: intent.avoidModes,
     onlyModes: intent.onlyModes,
-    limit: 4
+    limit: DEFAULT_ROUTE_LIMIT
   };
 
   const alerts = activeReports(now);
@@ -406,7 +436,7 @@ export function refreshRoutePlan({ now = Date.now() } = {}) {
 }
 
 /* Plan an explicit pair without disturbing the current search. */
-export function planEndpoints(from, to, { prefer = 'cost', student = state.studentPass, limit = 4, now = Date.now() } = {}) {
+export function planEndpoints(from, to, { prefer = 'cost', student = state.studentPass, limit = DEFAULT_ROUTE_LIMIT, now = Date.now() } = {}) {
   if (!from || !to || from === to) return { options: [], query: null, effects: scenarioEffects(state.scenario), alerts: [], featured: false };
 
   const query = { from, to, student, prefer, limit };
