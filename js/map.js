@@ -73,7 +73,7 @@ function routeGeoJson(card) {
       type: 'Feature',
       properties: {
         id: `${card.id}:${leg.from}>${leg.to}`,
-        color: asHex(MODE_COLORS[leg.mode]),
+        color: asHex(MODE_COLORS[leg.mode] || MODE_HEX.default),
         mode: leg.mode,
         name: `${from?.name || leg.from} → ${to?.name || leg.to}`
       },
@@ -404,8 +404,8 @@ function drawRoute(map) {
       source: 'route-source',
       paint: {
         'line-color': '#ffffff',
-        'line-width': 12,
-        'line-opacity': 0.32
+        'line-width': 14,
+        'line-opacity': 0.36
       }
     });
 
@@ -415,8 +415,9 @@ function drawRoute(map) {
       source: 'route-source',
       paint: {
         'line-color': ['get', 'color'],
-        'line-width': 6,
-        'line-opacity': 0.98
+        'line-width': 7,
+        'line-opacity': 1,
+        'line-gap-width': 0
       }
     });
   }

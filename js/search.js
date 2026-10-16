@@ -1,7 +1,12 @@
-import { state } from './state.js';
+import { state, refreshRoutePlan } from './state.js';
 import { parseQuery, CHIP_TONES, suggestHubs } from './core/parse.js';
 import { HUB_BY_ID, HUBS } from './core/network.js';
-import { renderRoutes } from './routes.js';
+import { renderRouteRibbon, renderRoutes } from './routes.js';
+import { refreshMap } from './map.js';
+
+/* Debounced live re-route for intent-aware search: the map redraws the most
+   efficient routing as the rider types recognisable areas. */
+let liveSearchTimer = null;
 
 function escapeHtml(value) {
   return String(value)
@@ -95,9 +100,17 @@ export function renderIntentChips(tokens, notice) {
 }
 
 export function handleSearchInput(value) {
+  clearTimeout(liveSearchTimer);
   updateSearchSuggestions(value);
   const { parsed, notice } = applyParsedQuery(value);
   renderIntentChips(parsed.tokens, notice);
+
+  /* Intent-aware search updates the map live: once both ends of the trip are
+     recognised from the dataset vocabulary, re-plan and redraw the route so
+     the rider sees the most efficient routing change as they type. */
+  if (parsed.origin && parsed.destination) {
+    liveSearchTimer = setTimeout(executeSearch, 300);
+  }
 }
 
 function readSearchValue() {
@@ -113,7 +126,10 @@ export function executeSearch() {
   if (!parsed.query) {
     state.search = { ...state.search, query: '', origin: null, destination: null, tokens: [] };
     renderIntentChips(parsed.tokens);
+    refreshRoutePlan();
     renderRoutes();
+    renderRouteRibbon();
+    refreshMap();
     return;
   }
 
@@ -129,8 +145,11 @@ export function executeSearch() {
     ];
   }
 
+  refreshRoutePlan();
   renderIntentChips(state.search.tokens, notice);
   renderRoutes();
+  renderRouteRibbon();
+  refreshMap();
 }
 
 /* Snap a GPS fix to the closest dataset stop — the same rule the report form uses. */

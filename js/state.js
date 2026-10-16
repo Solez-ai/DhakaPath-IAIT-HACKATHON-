@@ -432,6 +432,18 @@ export function refreshRoutePlan({ now = Date.now() } = {}) {
   cards.forEach(card => { card.selected = card.id === state.selectedRouteId; });
 
   state.routes = cards;
+
+  /* Two options can share the same line combination ("MRT-6 + Uttara bus").
+     Give colliding titles a time differentiator so no two cards look like the
+     exact same road. */
+  const titleCounts = new Map();
+  cards.forEach(card => titleCounts.set(card.title, (titleCounts.get(card.title) || 0) + 1));
+  cards.forEach(card => {
+    if (titleCounts.get(card.title) > 1) {
+      card.title = `${card.title} · ${card.timeMinutes} min`;
+    }
+  });
+
   return cards;
 }
 
