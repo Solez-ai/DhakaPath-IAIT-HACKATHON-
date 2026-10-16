@@ -378,7 +378,11 @@ export function planRoutes(query) {
       ['walk']
     ];
 
-    for (const onlyModes of modePatterns) {
+    const allowedPatterns = normalised.onlyModes?.length
+      ? modePatterns.filter(pattern => pattern.every(mode => normalised.onlyModes.includes(mode)))
+      : modePatterns;
+
+    for (const onlyModes of allowedPatterns) {
       const legs = searchLegs({ ...normalised, onlyModes }, 'time');
       addAlternate(legs, `${onlyModes.join('+')} only`);
       if (bySignature.size >= minimumOptions) break;
@@ -388,7 +392,8 @@ export function planRoutes(query) {
   if (bySignature.size < minimumOptions) {
     const corridorHubs = [...new Set((primary?.legs || []).map(leg => leg.from))];
     const joinHubs = corridorHubs.slice(1, Math.min(8, corridorHubs.length));
-    const modePairs = [['bus', 'metro'], ['metro', 'bus'], ['walk', 'metro'], ['metro', 'walk']];
+    const modePairs = [['bus', 'metro'], ['metro', 'bus'], ['walk', 'metro'], ['metro', 'walk']]
+      .filter(([a, b]) => !normalised.onlyModes?.length || (normalised.onlyModes.includes(a) && normalised.onlyModes.includes(b)));
 
     for (const hubId of joinHubs) {
       for (const [prefixMode, suffixMode] of modePairs) {
